@@ -14,8 +14,6 @@ const createFunction = async (expressInstance): Promise<void> => {
 };
 
 export const api = functions.https.onRequest(async (request, response) => {
-  await createFunction(expressServer)
-    .then((v) => console.log('nest ready'))
-    .catch((err) => console.log('Nest broken', err));
+  await createFunction(expressServer).then(v => console.log('nest ready')).catch(err=>console.log('Nest broken', err));
   expressServer(request, response);
 });
