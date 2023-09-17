@@ -17,7 +17,7 @@
     "fb:logs": "firebase functions:log",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-    "start": "npm-run-all --parallel start:dev fb:serve",
+    "start": "nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
@@ -31,7 +31,7 @@
   "engines": {
     "node": "18"
   },
-  "main": "dist/index.js",
+  "main": "dist/main.js",
   "dependencies": {
     "@nestjs/common": "^9.0.0",
     "@nestjs/core": "^9.0.0",
