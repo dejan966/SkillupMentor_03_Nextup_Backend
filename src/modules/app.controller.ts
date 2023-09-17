@@ -2,20 +2,14 @@ import { Controller, Get, Req, UseGuards } from '@nestjs/common';
 import { AppService } from './app.service';
 import { Request } from 'express';
 import { AuthGuard } from '@nestjs/passport';
+import { ListUsersResult } from 'firebase-admin/auth';
 
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  @UseGuards(AuthGuard('jwt'))
-  @Get('/hello')
-  getHello(@Req() request: Request): string {
-    console.log('User', JSON.stringify(request['user']));
-    return 'Hello ' + JSON.stringify(request['user']);
-  }
-
   @Get('usersF')
-  async getAllUsers(){
+  async getAllUsersF():Promise<ListUsersResult>{
     return this.appService.getAllUsers();
   }
 

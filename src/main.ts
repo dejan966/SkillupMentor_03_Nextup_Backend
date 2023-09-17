@@ -1,29 +1,52 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
-import * as express from 'express';
+import { AppModule } from 'modules/app.module';
+import express from 'express';
 import { ValidationPipe } from '@nestjs/common';
 import { ExpressAdapter } from '@nestjs/platform-express';
-import * as admin from "firebase-admin";
-const expressServer = express();
-require('dotenv').config();
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import path from 'path';
+import cookieParser from 'cookie-parser';
+import admin from 'firebase-admin';
+import Logging from 'library/Logging';
 
-const createFunction = async (expressInstance): Promise<void> => {
+async function bootstrap() {
+  const expressInstance = express();
   const app = await NestFactory.create(
     AppModule,
-    new ExpressAdapter(expressInstance),
+    new ExpressAdapter(expressInstance)
   );
-  app.enableCors();
+
+  app.enableCors({
+    origin: ['http://localhost:3000'],
+    credentials: true,
+  });
+  
   app.useGlobalPipes(new ValidationPipe());
-  await app.listen(3000);
-};
+  app.use(cookieParser());
+  
+  const dirname = path.resolve();
+  app.use('/uploads', express.static(path.join(dirname, '/uploads')));
+
+  const config = new DocumentBuilder()
+    .setTitle('Nextup')
+    .setDescription('This is the Nextup app')
+    .setVersion('1.0.0')
+    .build();
+  
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('/', app, document);
+  
+  const PORT = process.env.PORT || 8080;
+  await app.listen(PORT);
+}
 
 admin.initializeApp({
   credential: admin.credential.cert({
-    privateKey: process.env.F_PRIVATE_KEY.replace(/\\n/g, '\n'),
+    projectId: process.env.F_PROJECT_ID,
     clientEmail: process.env.F_CLIENT_EMAIL,
-    projectId: process.env.F_PROJECT_ID
+    privateKey: process.env.F_PRIVATE_KEY.replace(/\\n/g, '\n'),
   }),
   databaseURL: process.env.F_DATABASE_URL
 });
 
-createFunction(expressServer);
+bootstrap();
