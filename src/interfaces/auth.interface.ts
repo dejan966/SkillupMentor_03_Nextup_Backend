@@ -4,7 +4,7 @@ import { User } from 'schemas/user.schema';
 
 export interface TokenPayload {
   name: string;
-  sub: number;
+  sub: string;
   type: JwtType;
 }
 

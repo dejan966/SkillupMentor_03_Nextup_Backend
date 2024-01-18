@@ -1,9 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from 'schemas/user.schema';
 import { Model } from 'mongoose';
+import Logging from 'library/Logging';
 
 @Injectable()
 export class UsersService {
@@ -24,6 +25,17 @@ export class UsersService {
 
   async findById(id: string) {
     return await this.userModel.findById(id);
+  }
+
+  async findBy(condition) {
+    try {
+      return this.userModel.findOne(condition);
+    } catch (error) {
+      Logging.error(error);
+      throw new InternalServerErrorException(
+        `Something went wrong while searching for an element with condition: ${condition}.`,
+      );
+    }
   }
 
   async update(id: string, updateUserDto: UpdateUserDto) {
