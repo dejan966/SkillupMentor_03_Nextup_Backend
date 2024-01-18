@@ -3,7 +3,7 @@ import * as admin from "firebase-admin";
 
 @Injectable()
 export class AppService {
-  async getAllUsers(){
+  async authUsers(){
     return admin.auth().listUsers();
   }
 
@@ -17,7 +17,7 @@ export class AppService {
     return data;
   }
 
-  getHelloWorld(): string {
+  getHelloWorld() {
     return 'Hello World';
   }
 }
