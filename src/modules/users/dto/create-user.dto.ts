@@ -1,5 +1,5 @@
-import { IsOptional, IsNotEmpty, IsEmail, Matches } from "class-validator";
-import { Match } from "decorators/match.decorator";
+import { IsOptional, IsNotEmpty, IsEmail, Matches } from 'class-validator';
+import { Match } from 'decorators/match.decorator';
 
 export class CreateUserDto {
   @IsOptional()

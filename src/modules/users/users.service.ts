@@ -37,7 +37,9 @@ export class UsersService {
       await this.userModel.updateOne({ _id: id }, user);
       return user;
     } catch (error) {
-      throw new NotFoundException('Something went wrong while updating the data.');
+      throw new NotFoundException(
+        'Something went wrong while updating the data.',
+      );
     }
   }
 

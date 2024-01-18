@@ -9,10 +9,10 @@ import { UsersModule } from './users/users.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: [`.env.${process.env.STAGE}`]
+      envFilePath: [`.env.${process.env.STAGE}`],
     }),
     MongooseModule.forRoot(process.env.M_DATABASE_URL),
-    UsersModule
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
