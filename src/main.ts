@@ -7,7 +7,6 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import path from 'path';
 import cookieParser from 'cookie-parser';
 import admin from 'firebase-admin';
-import Logging from 'library/Logging';
 
 async function bootstrap() {
   const expressInstance = express();

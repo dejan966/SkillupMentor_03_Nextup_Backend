@@ -26,17 +26,17 @@ export class UsersController {
   }
 
   @Get(':id')
-  async findById(@Param('id') id: string) {
-    return this.usersService.findById(id);
+  async findById(@Param('id') _id: string) {
+    return this.usersService.findById(_id);
   }
 
   @Patch(':id')
-  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(id, updateUserDto);
+  async update(@Param('id') _id: string, @Body() updateUserDto: UpdateUserDto) {
+    return this.usersService.update(_id, updateUserDto);
   }
 
   @Delete(':id')
-  async remove(@Param('id') id: string) {
-    return this.usersService.remove(id);
+  async remove(@Param('id') _id: string) {
+    return this.usersService.remove(_id);
   }
 }

@@ -7,7 +7,6 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User } from 'schemas/user.schema';
-import Logging from 'library/Logging';
 import { Request, Response } from 'express';
 import { UsersService } from '../users/users.service';
 import { RegisterUserDto } from './dto/register-user.dto';
@@ -25,7 +24,7 @@ export class AuthService {
   ) {}
 
   async validateUser(email: string, password: string): Promise<User> {
-    Logging.info('Validating user...');
+    console.info('Validating user...');
     const user = await this.usersService.findBy({ email: email });
     if (!user) {
       throw new BadRequestException('Invalid credentials');
@@ -33,7 +32,7 @@ export class AuthService {
     if (!(await this.utilsService.compareHash(password, user.password))) {
       throw new BadRequestException('Invalid credentials');
     }
-    Logging.info('User is valid');
+    console.info('User is valid');
     return user;
   }
 
@@ -59,7 +58,7 @@ export class AuthService {
   }
 
   async generateToken(user: User, type: JwtType) {
-    const payload: TokenPayload = { sub: user.id, name: user.email, type };
+    const payload: TokenPayload = { sub: user._id, name: user.email, type };
     let token: string;
     try {
       switch (type) {
@@ -81,7 +80,7 @@ export class AuthService {
           throw new BadRequestException('Access denied');
       }
     } catch (error) {
-      Logging.error(error);
+      console.error(error);
       throw new InternalServerErrorException(
         'Something went wrong while generating a new token.',
       );
@@ -108,7 +107,7 @@ export class AuthService {
       }
       return cookie;
     } catch (error) {
-      Logging.error(error);
+      console.error(error);
       /* if (error?.code === PostgresErrorCode.UniqueViolation) {
         throw new BadRequestException('User with that email already exists.');
       }
@@ -130,7 +129,7 @@ export class AuthService {
         secret: this.configService.get('JWT_REFRESH_SECRET'),
       });
     } catch (error) {
-      Logging.error(error);
+      console.error(error);
       throw new UnauthorizedException(
         'Something went wrong while refreshing tokens',
       );
@@ -141,7 +140,7 @@ export class AuthService {
     try {
       req.res.setHeader('Set-Cookie', cookie);
     } catch (error) {
-      Logging.error(error);
+      console.error(error);
       throw new InternalServerErrorException(
         'Something went wrong while setting cookies into the response header',
       );
@@ -151,11 +150,11 @@ export class AuthService {
 
   async signout(userId: string, res: Response): Promise<void> {
     const user = await this.usersService.findById(userId);
-    await this.usersService.update(user.id, { refresh_token: null });
+    await this.usersService.update(user._id, { refresh_token: null });
     try {
       res.setHeader('Set-Cookie', this.getCookiesForSignOut()).sendStatus(200);
     } catch (error) {
-      Logging.error(error);
+      console.error(error);
       throw new InternalServerErrorException(
         'Something went wrong while setting cookies into response header',
       );

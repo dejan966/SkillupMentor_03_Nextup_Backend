@@ -1,12 +1,18 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Exclude } from 'class-transformer';
 import { HydratedDocument } from 'mongoose';
-import { Base } from './base.entity';
+import { PrimaryGeneratedColumn } from 'typeorm';
 
 export type UserDocument = HydratedDocument<User>;
 
-@Schema()
-export class User extends Base {
+@Schema({ timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' }})
+export class User {
+  @PrimaryGeneratedColumn()
+  _id: string;
+  
+  @Prop({ default: 'default_profile.svg' })
+  avatar: string;
+  
   @Prop({ nullable: true })
   first_name: string;
 
@@ -19,9 +25,6 @@ export class User extends Base {
   @Prop({ required: true })
   @Exclude()
   password: string;
-
-  @Prop({ default: 'default_profile.svg' })
-  avatar: string;
 
   @Prop({ nullable: true, default: null })
   @Exclude()

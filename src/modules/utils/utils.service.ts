@@ -1,6 +1,5 @@
 import { InternalServerErrorException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import Logging from 'library/Logging';
 
 export class UtilsService {
   async hash(data: string, salt = 10) {
@@ -8,7 +7,7 @@ export class UtilsService {
       const generatedSalt = await bcrypt.genSalt(salt);
       return bcrypt.hash(data, generatedSalt);
     } catch (error) {
-      Logging.error(error);
+      console.error(error);
       throw new InternalServerErrorException(
         'Something went wrong while hashing the password',
       );
@@ -19,7 +18,7 @@ export class UtilsService {
     try {
       return bcrypt.compare(data, encryptedData);
     } catch (error) {
-      Logging.error(error);
+      console.error(error);
       throw new InternalServerErrorException(
         'Something went wrong while comparing the hash',
       );

@@ -2,8 +2,6 @@ import {
   Controller,
   Post,
   Body,
-  UseInterceptors,
-  ClassSerializerInterceptor,
   HttpCode,
   HttpStatus,
   Res,
@@ -26,12 +24,11 @@ import { GetCurrentUser } from 'decorators/get-current-user.decorator';
 import { JwtAuthGuard } from './guards/jwt.guard';
 
 @Controller('auth')
-@UseInterceptors(ClassSerializerInterceptor)
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Public()
-  @Post('signup')
+  @Post('register')
   @HttpCode(HttpStatus.CREATED)
   async register(@Body() body: RegisterUserDto): Promise<User> {
     return this.authService.register(body);
@@ -65,7 +62,7 @@ export class AuthController {
       CookieType.REFRESH_TOKEN,
     );
     try {
-      await this.authService.updateRtHash(user.id, refresh_token);
+      await this.authService.updateRtHash(user._id, refresh_token);
       res
         .setHeader('Set-Cookie', [access_token_cookie, refresh_token_cookie])
         .json({ ...user });
@@ -83,6 +80,6 @@ export class AuthController {
     @GetCurrentUser() userData: User,
     @Res({ passthrough: true }) res: Response,
   ) {
-    return this.authService.signout(userData.id, res);
+    return this.authService.signout(userData._id, res);
   }
 }
