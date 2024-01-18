@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -23,11 +23,22 @@ export class UsersService {
   }
 
   async findById(id: string) {
-    return `This action returns a #${id} user`;
+    return await this.userModel.findById(id);
   }
 
   async update(id: string, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+    const user = await this.findById(id);
+    try {
+      for (const key in user) {
+        if (updateUserDto[key] !== undefined) {
+          user[key] = updateUserDto[key];
+        }
+      }
+      await this.userModel.updateOne({ _id: id }, user);
+      return user;
+    } catch (error) {
+      throw new NotFoundException('Something went wrong while updating the data.');
+    }
   }
 
   async remove(id: string) {
