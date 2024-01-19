@@ -5,14 +5,14 @@ import { PrimaryGeneratedColumn } from 'typeorm';
 
 export type UserDocument = HydratedDocument<User>;
 
-@Schema({ timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' }})
+@Schema({ timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } })
 export class User {
   @PrimaryGeneratedColumn()
   _id: string;
-  
+
   @Prop({ default: 'default_profile.svg' })
   avatar: string;
-  
+
   @Prop({ nullable: true })
   first_name: string;
 

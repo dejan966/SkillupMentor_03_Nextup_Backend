@@ -12,6 +12,6 @@ import { UtilsService } from 'modules/utils/utils.service';
   ],
   controllers: [UsersController],
   providers: [UsersService, JwtService, UtilsService],
-  exports: [UsersService]
+  exports: [UsersService],
 })
 export class UsersModule {}

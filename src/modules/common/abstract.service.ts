@@ -1,4 +1,8 @@
-import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { Model } from 'mongoose';
 
 @Injectable()
@@ -40,7 +44,9 @@ export abstract class AbstractService<T> {
       await this.model.updateOne({ _id }, data);
       return data;
     } catch (error) {
-      throw new NotFoundException('Something went wrong while updating the data.');
+      throw new NotFoundException(
+        'Something went wrong while updating the data.',
+      );
     }
   }
 
@@ -49,7 +55,9 @@ export abstract class AbstractService<T> {
       return this.model.findOneAndDelete({ _id });
     } catch (error) {
       console.error(error);
-      throw new InternalServerErrorException('Something went wrong while deleting an item.');
+      throw new InternalServerErrorException(
+        'Something went wrong while deleting an item.',
+      );
     }
   }
 }
