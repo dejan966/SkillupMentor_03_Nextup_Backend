@@ -5,7 +5,6 @@ import {
   InternalServerErrorException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import { User } from 'schemas/user.schema';
 import { Request, Response } from 'express';
 import { UsersService } from '../users/users.service';
@@ -13,6 +12,7 @@ import { RegisterUserDto } from './dto/register-user.dto';
 import { UtilsService } from 'modules/utils/utils.service';
 import { CookieType, JwtType, TokenPayload } from 'interfaces/auth.interface';
 import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
@@ -25,7 +25,7 @@ export class AuthService {
 
   async validateUser(email: string, password: string): Promise<User> {
     console.info('Validating user...');
-    const user = await this.usersService.findBy({ email: email });
+    const user = await this.usersService.findBy({ email });
     if (!user) {
       throw new BadRequestException('Invalid credentials');
     }
@@ -40,7 +40,7 @@ export class AuthService {
     const hashedPassword: string = await this.utilsService.hash(
       registerUserDto.password,
     );
-    const user = await this.usersService.create({
+    const user = await this.usersService.createUser({
       ...registerUserDto,
       password: hashedPassword,
     });
@@ -176,7 +176,7 @@ export class AuthService {
     );
     if (isRefreshTokenMatching) {
       return {
-        id: user.id,
+        id: user._id,
         email: user.email,
       };
     }
