@@ -7,23 +7,22 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import path from 'path';
 import cookieParser from 'cookie-parser';
 import admin from 'firebase-admin';
-import Logging from 'library/Logging';
 
 async function bootstrap() {
   const expressInstance = express();
   const app = await NestFactory.create(
     AppModule,
-    new ExpressAdapter(expressInstance)
+    new ExpressAdapter(expressInstance),
   );
 
   app.enableCors({
     origin: ['http://localhost:3000'],
     credentials: true,
   });
-  
+
   app.useGlobalPipes(new ValidationPipe());
   app.use(cookieParser());
-  
+
   const dirname = path.resolve();
   app.use('/uploads', express.static(path.join(dirname, '/uploads')));
 
@@ -32,10 +31,10 @@ async function bootstrap() {
     .setDescription('This is the Nextup app')
     .setVersion('1.0.0')
     .build();
-  
+
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('/', app, document);
-  
+
   const PORT = process.env.PORT || 8080;
   await app.listen(PORT);
 }
@@ -46,7 +45,7 @@ admin.initializeApp({
     clientEmail: process.env.F_CLIENT_EMAIL,
     privateKey: process.env.F_PRIVATE_KEY.replace(/\\n/g, '\n'),
   }),
-  databaseURL: process.env.F_DATABASE_URL
+  databaseURL: process.env.F_DATABASE_URL,
 });
 
 bootstrap();

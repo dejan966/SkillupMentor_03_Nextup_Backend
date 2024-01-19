@@ -1,0 +1,18 @@
+<svg 
+    width="64" 
+    height="64" 
+    viewBox="0 0 64 64" 
+    fill="none" 
+    xmlns="http://www.w3.org/2000/svg"
+>
+    <rect 
+        width="64" 
+        height="64" 
+        rx="32" 
+        fill="#BDBDBD"
+    />
+    <path 
+        d="M32 32C34.21 32 36 30.21 36 28C36 25.79 34.21 24 32 24C29.79 24 28 25.79 28 28C28 30.21 29.79 32 32 32ZM32 34C29.33 34 24 35.34 24 38V40H40V38C40 35.34 34.67 34 32 34Z" 
+        fill="white"
+    />
+</svg>
