@@ -1,4 +1,5 @@
 import { IsOptional } from 'class-validator';
+import { User } from 'schemas/user.schema';
 
 export class UpdateEventDto {
     @IsOptional()
@@ -15,4 +16,7 @@ export class UpdateEventDto {
 
   @IsOptional()
   image?: string;
+
+  @IsOptional()
+  booked_users: User[]
 }

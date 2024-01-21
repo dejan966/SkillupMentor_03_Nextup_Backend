@@ -27,6 +27,12 @@ export class EventsController {
     return this.eventsService.create(createEventDto);
   }
 
+  @Patch('addUser/:id')
+  @UseGuards(JwtAuthGuard)
+  async addUser(@Param('id') id: string, @GetCurrentUser() user: User){
+    return this.eventsService.addUser(id, user);
+  }
+
   @Get()
   async findAll() {
     return this.eventsService.findAll();
@@ -39,7 +45,7 @@ export class EventsController {
   }
 
   @Patch(':id')
-  @UseGuards(JwtAuthGuard, UserGuard)
+  @UseGuards(JwtAuthGuard)
   async update(@Param('id') id: string, @Body() updateEventDto: UpdateEventDto) {
     return this.eventsService.update(id, updateEventDto);
   }

@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, SchemaTypes } from 'mongoose';
+import { HydratedDocument } from 'mongoose';
 import { PrimaryGeneratedColumn } from 'typeorm';
 import { User } from './user.schema';
 
@@ -34,8 +34,8 @@ export class Event {
   @Prop({ type: { _id: String, first_name: String, last_name: String, email: String } })
   creator: User;
 
-  @Prop({ type: [SchemaTypes.ObjectId], ref: 'User' })
-  booked_users: User[];
+  @Prop({ type: [{ _id: String }] })
+  booked_users: [{ _id: String }];
 }
 
 export const EventSchema = SchemaFactory.createForClass(Event);
