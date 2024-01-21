@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, SchemaTypes, Types } from 'mongoose';
+import { HydratedDocument, SchemaTypes } from 'mongoose';
 import { PrimaryGeneratedColumn } from 'typeorm';
 import { User } from './user.schema';
 
@@ -8,7 +8,7 @@ export type EventDocument = HydratedDocument<Event>;
 @Schema({ timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } })
 export class Event {
   @PrimaryGeneratedColumn()
-  _id: Types.ObjectId;
+  _id: string;
 
   @Prop({ required: true })
   name: string;
@@ -16,11 +16,11 @@ export class Event {
   @Prop({ required: true })
   location: string;
 
-  @Prop({ required: true })
-  date: Date;
+  @Prop({ default: Date.now(), required: true })
+  date: string;
 
-  @Prop({ type: 'time', required: true })
-  hour: Date;
+  @Prop({ default: Date.now(), required: true })
+  hour: string;
 
   @Prop({ required: true })
   max_users: number;
@@ -31,7 +31,7 @@ export class Event {
   @Prop()
   image: string;
 
-  @Prop()
+  @Prop({ type: { _id: String, first_name: String, last_name: String, email: String } })
   creator: User;
 
   @Prop({ type: [SchemaTypes.ObjectId], ref: 'User' })
