@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Exclude } from 'class-transformer';
-import { HydratedDocument } from 'mongoose';
+import { HydratedDocument, Types } from 'mongoose';
 import { PrimaryGeneratedColumn } from 'typeorm';
 
 export type UserDocument = HydratedDocument<User>;
@@ -8,7 +8,7 @@ export type UserDocument = HydratedDocument<User>;
 @Schema({ timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } })
 export class User {
   @PrimaryGeneratedColumn()
-  _id: string;
+  _id: Types.ObjectId;
 
   @Prop({ default: 'default_profile.svg' })
   avatar: string;
