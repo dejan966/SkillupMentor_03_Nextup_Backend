@@ -34,7 +34,7 @@ export class Event {
   @Prop({ type: S.Types.ObjectId, ref: 'User' })
   @Type(() => User)
   creator: User;
-  
+
   @Prop({ type: [{ type: S.Types.ObjectId, ref: 'User' }] })
   booked_users: S.Types.ObjectId[];
 }

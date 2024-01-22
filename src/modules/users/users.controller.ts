@@ -45,8 +45,31 @@ export class UsersController {
 
   @Patch(':id')
   @UseGuards(JwtAuthGuard, UserGuard)
-  async update(@Param('id') _id: ObjectId, @Body() updateUserDto: UpdateUserDto) {
+  async update(
+    @Param('id') _id: ObjectId,
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
     return this.usersService.update(_id, updateUserDto);
+  }
+
+  @Patch('/me/update-password')
+  @UseGuards(JwtAuthGuard)
+  async updatePassword(
+    @GetCurrentUser() user: User,
+    @Body()
+    updateUserDto: {
+      current_password: string;
+      password: string;
+      confirm_password: string;
+    },
+  ) {
+    return this.usersService.updatePassword(user, updateUserDto);
+  }
+
+  @Post('me/reset-password')
+  @UseGuards(JwtAuthGuard)
+  async checkEmail(@Body() updateUserDto: { email: string }) {
+    return this.usersService.checkEmail(updateUserDto.email);
   }
 
   @Delete(':id')

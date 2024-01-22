@@ -23,13 +23,16 @@ export class EventsController {
 
   @Post()
   @UseGuards(JwtAuthGuard)
-  async create(@Body() createEventDto: CreateEventDto, @GetCurrentUser() creator: User) {
+  async create(
+    @Body() createEventDto: CreateEventDto,
+    @GetCurrentUser() creator: User,
+  ) {
     return this.eventsService.addEvent(createEventDto, creator);
   }
 
   @Patch('bookUser/:id')
   @UseGuards(JwtAuthGuard, EventGuard)
-  async addUser(@Param('id') _id: ObjectId, @GetCurrentUser() user: User){
+  async addUser(@Param('id') _id: ObjectId, @GetCurrentUser() user: User) {
     return this.eventsService.bookUser(_id, user);
   }
 
@@ -46,7 +49,10 @@ export class EventsController {
 
   @Patch(':id')
   @UseGuards(JwtAuthGuard, EventGuard)
-  async update(@Param('id') _id: ObjectId, @Body() updateEventDto: UpdateEventDto) {
+  async update(
+    @Param('id') _id: ObjectId,
+    @Body() updateEventDto: UpdateEventDto,
+  ) {
     return this.eventsService.update(_id, updateEventDto);
   }
 

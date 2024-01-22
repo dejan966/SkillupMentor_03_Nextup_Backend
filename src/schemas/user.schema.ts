@@ -32,7 +32,7 @@ export class User {
   @Prop({ nullable: true, default: null })
   @Exclude()
   password_token: string;
-  
+
   @Prop({ type: [{ type: S.Types.ObjectId, ref: 'Event' }] })
   events: S.Types.ObjectId[];
 }

@@ -5,6 +5,9 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { EventSchema } from 'schemas/event.schema';
 import { User, UserSchema } from 'schemas/user.schema';
 import { UsersService } from 'modules/users/users.service';
+import { JwtService } from '@nestjs/jwt';
+import { MailerModule, MailerService } from '@nestjs-modules/mailer';
+import { UtilsService } from 'modules/utils/utils.service';
 
 @Module({
   imports: [
@@ -12,6 +15,6 @@ import { UsersService } from 'modules/users/users.service';
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
   ],
   controllers: [EventsController],
-  providers: [EventsService, UsersService],
+  providers: [EventsService, UsersService, JwtService, UtilsService],
 })
 export class EventsModule {}
