@@ -12,7 +12,7 @@ import { EventsService } from './events.service';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { JwtAuthGuard } from 'modules/auth/guards/jwt.guard';
-import { UserGuard } from 'modules/auth/guards/user.guard';
+import { EventGuard } from 'modules/auth/guards/event.guard';
 import { GetCurrentUser } from 'decorators/get-current-user.decorator';
 import { User } from 'schemas/user.schema';
 import { ObjectId } from 'mongoose';
@@ -28,7 +28,7 @@ export class EventsController {
   }
 
   @Patch('bookUser/:id')
-  @UseGuards(JwtAuthGuard, UserGuard)
+  @UseGuards(JwtAuthGuard, EventGuard)
   async addUser(@Param('id') _id: ObjectId, @GetCurrentUser() user: User){
     return this.eventsService.bookUser(_id, user);
   }
@@ -45,13 +45,13 @@ export class EventsController {
   }
 
   @Patch(':id')
-  @UseGuards(JwtAuthGuard, UserGuard)
+  @UseGuards(JwtAuthGuard, EventGuard)
   async update(@Param('id') _id: ObjectId, @Body() updateEventDto: UpdateEventDto) {
     return this.eventsService.update(_id, updateEventDto);
   }
 
   @Delete(':id')
-  @UseGuards(JwtAuthGuard, UserGuard)
+  @UseGuards(JwtAuthGuard, EventGuard)
   async remove(@Param('id') _id: ObjectId) {
     return this.eventsService.remove(_id);
   }
