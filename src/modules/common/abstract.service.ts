@@ -1,5 +1,9 @@
-import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
-import { Model } from 'mongoose';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
+import { Model, ObjectId } from 'mongoose';
 
 @Injectable()
 export abstract class AbstractService<T> {
@@ -25,11 +29,11 @@ export abstract class AbstractService<T> {
     }
   }
 
-  async findById(_id: string): Promise<T> {
+  async findById(_id: ObjectId): Promise<T> {
     return await this.model.findById(_id);
   }
 
-  async update(_id: string, updateDataDto): Promise<T> {
+  async update(_id: ObjectId, updateDataDto): Promise<T> {
     const data = await this.findById(_id);
     try {
       for (const key in data) {
@@ -40,16 +44,20 @@ export abstract class AbstractService<T> {
       await this.model.updateOne({ _id }, data);
       return data;
     } catch (error) {
-      throw new NotFoundException('Something went wrong while updating the data.');
+      throw new NotFoundException(
+        'Something went wrong while updating the data.',
+      );
     }
   }
 
-  async remove(_id: string) {
+  async remove(_id: ObjectId) {
     try {
       return this.model.findOneAndDelete({ _id });
     } catch (error) {
       console.error(error);
-      throw new InternalServerErrorException('Something went wrong while deleting an item.');
+      throw new InternalServerErrorException(
+        'Something went wrong while deleting an item.',
+      );
     }
   }
 }
