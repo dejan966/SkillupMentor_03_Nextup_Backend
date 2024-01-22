@@ -16,6 +16,4 @@ export class CreateEventDto {
 
   @IsOptional()
   image?: string;
-
-  creator: User;
 }

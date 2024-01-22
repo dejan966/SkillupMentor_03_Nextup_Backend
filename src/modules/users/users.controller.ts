@@ -14,6 +14,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { GetCurrentUser } from 'decorators/get-current-user.decorator';
 import { JwtAuthGuard } from 'modules/auth/guards/jwt.guard';
 import { User } from 'schemas/user.schema';
+import { ObjectId } from 'mongoose';
 
 @Controller('users')
 export class UsersController {
@@ -36,17 +37,20 @@ export class UsersController {
   }
 
   @Get(':id')
-  async findById(@Param('id') _id: string) {
+  @UseGuards(JwtAuthGuard)
+  async findById(@Param('id') _id: ObjectId) {
     return this.usersService.findById(_id);
   }
 
   @Patch(':id')
-  async update(@Param('id') _id: string, @Body() updateUserDto: UpdateUserDto) {
+  @UseGuards(JwtAuthGuard)
+  async update(@Param('id') _id: ObjectId, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(_id, updateUserDto);
   }
 
   @Delete(':id')
-  async remove(@Param('id') _id: string) {
+  @UseGuards(JwtAuthGuard)
+  async remove(@Param('id') _id: ObjectId) {
     return this.usersService.remove(_id);
   }
 }

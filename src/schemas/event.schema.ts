@@ -1,14 +1,14 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
-import { PrimaryGeneratedColumn } from 'typeorm';
+import { HydratedDocument, ObjectId, Schema as S } from 'mongoose';
 import { User } from './user.schema';
+import { Transform, Type } from 'class-transformer';
 
 export type EventDocument = HydratedDocument<Event>;
 
 @Schema({ timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } })
 export class Event {
-  @PrimaryGeneratedColumn()
-  _id: string;
+  @Transform(({ value }) => value.toString())
+  _id: ObjectId;
 
   @Prop({ required: true })
   name: string;
@@ -31,11 +31,12 @@ export class Event {
   @Prop()
   image: string;
 
-  @Prop({ type: { _id: String, first_name: String, last_name: String, email: String } })
+  @Prop({ type: S.Types.ObjectId, ref: 'User' })
+  @Type(() => User)
   creator: User;
-
-  @Prop({ type: [{ _id: String }] })
-  booked_users: [{ _id: String }];
+  
+  @Prop({ type: [{ type: S.Types.ObjectId, ref: 'User' }] })
+  booked_users: S.Types.ObjectId[];
 }
 
 export const EventSchema = SchemaFactory.createForClass(Event);

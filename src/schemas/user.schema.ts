@@ -1,14 +1,13 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Exclude } from 'class-transformer';
-import { HydratedDocument } from 'mongoose';
-import { PrimaryGeneratedColumn } from 'typeorm';
+import { Exclude, Transform } from 'class-transformer';
+import { HydratedDocument, ObjectId, Schema as S } from 'mongoose';
 
 export type UserDocument = HydratedDocument<User>;
 
 @Schema({ timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } })
 export class User {
-  @PrimaryGeneratedColumn()
-  _id: string;
+  @Transform(({ value }) => value.toString())
+  _id: ObjectId;
 
   @Prop({ default: 'default_profile.svg' })
   avatar: string;
@@ -33,6 +32,9 @@ export class User {
   @Prop({ nullable: true, default: null })
   @Exclude()
   password_token: string;
+  
+  @Prop({ type: [{ type: S.Types.ObjectId, ref: 'Event' }] })
+  events: S.Types.ObjectId[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
