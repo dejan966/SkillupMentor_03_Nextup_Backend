@@ -1,3 +1,4 @@
+import { MailerService } from '@nestjs-modules/mailer';
 import { InternalServerErrorException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 
@@ -20,7 +21,7 @@ export class UtilsService {
     } catch (error) {
       console.error(error);
       throw new InternalServerErrorException(
-        'Something went wrong while comparing the hash',
+        'Something went wrong while comparing the hash.',
       );
     }
   }

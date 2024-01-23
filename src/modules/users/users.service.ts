@@ -5,12 +5,12 @@ import { Model } from 'mongoose';
 import { AbstractService } from 'modules/common/abstract.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { Event } from 'schemas/event.schema';
-import { MailerService } from '@nestjs-modules/mailer';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { JwtType } from 'interfaces/auth.interface';
 import { UtilsService } from 'modules/utils/utils.service';
 import { IJwtPayload } from 'interfaces/jwt-payload.interface';
+import { MailerService } from '@nestjs-modules/mailer';
 
 @Injectable()
 export class UsersService extends AbstractService<User> {
@@ -19,8 +19,8 @@ export class UsersService extends AbstractService<User> {
     private userModel: Model<User>,
     private configService: ConfigService,
     private jwtService: JwtService,
-    private readonly mailerService: MailerService,
     private readonly utilsService: UtilsService,
+    private readonly mailerService: MailerService,
   ) {
     super(userModel);
   }
@@ -34,6 +34,14 @@ export class UsersService extends AbstractService<User> {
     return createdUser.save();
   }
 
+  
+  async checkEmail(userEmail: string) {
+    const user = await this.findBy({ email: userEmail });
+    if (user) {
+      return this.makeToken(user);
+    }
+  }
+  
   async checkToken(user: User, hashed_token: string) {
     if (
       await this.utilsService.compareHash(user.password_token, hashed_token)
@@ -49,14 +57,7 @@ export class UsersService extends AbstractService<User> {
     return false;
   }
 
-  async checkEmail(userEmail: string) {
-    const user = await this.findBy({ email: userEmail });
-    if (user) {
-      return this.sendEmail(user);
-    }
-  }
-
-  async sendEmail(user: User) {
+  async makeToken(user: User){
     const { password_token } = user;
 
     if (password_token) {
@@ -81,12 +82,21 @@ export class UsersService extends AbstractService<User> {
     const hashed = await this.utilsService.hash(token);
 
     await this.update(user._id, { password_token: token });
+
+    const subject = 'Your password reset token';
+    const text = `Hi.<p>Your password reset link is: </p><p>It expires in 15 minutes.</p><p>Your Nextup support team</p>`;
+    const html = `Hi.<p>Your password reset link is <a href="http://localhost:3000/me/update-password?token=${hashed}">here</a>.</p><p>It expires in 15 minutes.</p><p>Your Nextup support team</p>`;
+    
+    return this.sendEmail(user.email, subject, text, html);
+  }
+
+  async sendEmail(email: string, subject: string, text: string, html: string) {
     const response = await this.mailerService.sendMail({
       from: 'Nextup Support <ultimate24208@gmail.com>',
-      to: user.email,
-      subject: 'Your password reset token',
-      text: `Hi.<p>Your password reset link is: </p><p>It expires in 15 minutes.</p>`,
-      html: `Hi.<p>Your password reset link is <a href="http://localhost:3000/me/update-password?token=${hashed}">here</a>.</p><p>It expires in 15 minutes.</p>`,
+      to: email,
+      subject: subject,
+      text: text,
+      html: html,
     });
     return response;
   }

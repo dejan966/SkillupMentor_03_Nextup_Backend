@@ -37,6 +37,16 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
+  @Get(':id/:token(*)')
+  @UseGuards(JwtAuthGuard)
+  async checkToken(
+    @Param('id') user_id: ObjectId,
+    @Param('token') hashed_token: string,
+  ) {
+    const user = await this.usersService.findById(user_id);
+    return this.usersService.checkToken(user, hashed_token);
+  }
+
   @Get(':id')
   @UseGuards(JwtAuthGuard)
   async findById(@Param('id') _id: ObjectId) {
