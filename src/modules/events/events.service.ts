@@ -7,6 +7,8 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, ObjectId } from 'mongoose';
 import { User } from 'schemas/user.schema';
 import { UsersService } from 'modules/users/users.service';
+import { CronJob } from 'cron';
+import { SchedulerRegistry } from '@nestjs/schedule';
 
 @Injectable()
 export class EventsService extends AbstractService<Event> {
@@ -14,6 +16,7 @@ export class EventsService extends AbstractService<Event> {
     @InjectModel(Event.name)
     private eventModel: Model<Event>,
     private readonly usersService: UsersService,
+    private readonly schedulerRegistry: SchedulerRegistry
   ) {
     super(eventModel);
   }
@@ -21,6 +24,7 @@ export class EventsService extends AbstractService<Event> {
   async addEvent(createEventDto: CreateEventDto, creator: User) {
     const createdEvent = new this.eventModel({ ...createEventDto, creator });
     createdEvent.save();
+    this.scheduleEmail(createdEvent)
     return await this.usersService.addedEvent(creator, createdEvent);
   }
 
@@ -34,5 +38,30 @@ export class EventsService extends AbstractService<Event> {
     } else if (event.booked_users.length === event.max_users) {
       throw new BadRequestException('Maximum amount of users reached.');
     }
+  }
+
+  async scheduleEmail(event) {
+    const subject = 'Reminder';
+    const text = `Hi<p>Please, dont forget about the event that will be at .</p>`;
+    const html = `Hi<p>Please, dont forget about the event that will be ${event.date + ' ' + event.hour}.</p>`
+    const sendDate = new Date(event.date)
+    
+    const hours = event.hour.toString().split(":")
+    sendDate.setHours(hours[0], hours[1])
+    sendDate.setDate(sendDate.getDate() - 1)
+
+    const job = new CronJob(sendDate, () => {
+      this.usersService.sendEmail({
+        from: 'Nextup Support <ultimate24208@gmail.com>',
+        to: event.creator.email,
+        date: sendDate,
+        subject: subject,
+        text: text,
+        html: html
+      })
+    });
+
+    this.schedulerRegistry.addCronJob(`${Date.now()}-${subject}`, job);
+    job.start();
   }
 }

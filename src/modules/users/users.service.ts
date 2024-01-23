@@ -10,7 +10,7 @@ import { JwtService } from '@nestjs/jwt';
 import { JwtType } from 'interfaces/auth.interface';
 import { UtilsService } from 'modules/utils/utils.service';
 import { IJwtPayload } from 'interfaces/jwt-payload.interface';
-import { MailerService } from '@nestjs-modules/mailer';
+import { ISendMailOptions, MailerService } from '@nestjs-modules/mailer';
 
 @Injectable()
 export class UsersService extends AbstractService<User> {
@@ -87,17 +87,17 @@ export class UsersService extends AbstractService<User> {
     const text = `Hi.<p>Your password reset link is: </p><p>It expires in 15 minutes.</p><p>Your Nextup support team</p>`;
     const html = `Hi.<p>Your password reset link is <a href="http://localhost:3000/me/update-password?token=${hashed}">here</a>.</p><p>It expires in 15 minutes.</p><p>Your Nextup support team</p>`;
     
-    return this.sendEmail(user.email, subject, text, html);
-  }
-
-  async sendEmail(email: string, subject: string, text: string, html: string) {
-    const response = await this.mailerService.sendMail({
+    return this.sendEmail({
       from: 'Nextup Support <ultimate24208@gmail.com>',
-      to: email,
+      to: user.email,
       subject: subject,
       text: text,
-      html: html,
+      html: html
     });
+  }
+
+  async sendEmail(options: ISendMailOptions) {
+    const response = await this.mailerService.sendMail(options);
     return response;
   }
 

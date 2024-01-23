@@ -37,7 +37,13 @@ export class AuthController {
     const subject = 'Welcome email';
     const text = `Hi.<p>Thank you for your registration! We will notify you about any new events in your area.</p><p>Your Nextup support team</p>`;
     const html = `Hi.<p>Thank you for your registration! We will notify you about any new events in your area.</p><p>Your Nextup support team</p>`;
-    return this.usersService.sendEmail(body.email, subject, text, html);
+    return this.usersService.sendEmail({
+      from: 'Nextup Support <ultimate24208@gmail.com>',
+      to: body.email,
+      subject: subject,
+      text: text,
+      html: html
+    });
   }
   
   @Public()

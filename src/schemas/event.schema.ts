@@ -16,10 +16,10 @@ export class Event {
   @Prop({ required: true })
   location: string;
 
-  @Prop({ default: Date.now(), required: true })
+  @Prop({ required: true })
   date: string;
 
-  @Prop({ default: Date.now(), required: true })
+  @Prop({ required: true })
   hour: string;
 
   @Prop({ required: true })

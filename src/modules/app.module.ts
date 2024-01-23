@@ -7,9 +7,11 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { EventsModule } from './events/events.module';
 import { MailerModule } from '@nestjs-modules/mailer';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
+    ScheduleModule.forRoot(),
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: [`.env.${process.env.STAGE}`],
