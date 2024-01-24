@@ -96,6 +96,24 @@ export class UsersService extends AbstractService<User> {
     });
   }
 
+  async newEventsNotification() {
+    const users = await this.findAll();
+
+    const subject = 'New events';
+    const text = `Hi.<p>Theres new events available.</p><p>Your Nextup support team</p>`;
+    const html = `Hi.<p>Theres new events available.</p><p>Your Nextup support team</p>`;
+
+    users.forEach(user => {
+      this.sendEmail({
+        from: 'Nextup Support <ultimate24208@gmail.com>',
+        to: user.email,
+        subject: subject,
+        text: text,
+        html: html
+      })
+    })
+  }
+
   async sendEmail(options: ISendMailOptions) {
     const response = await this.mailerService.sendMail(options);
     return response;

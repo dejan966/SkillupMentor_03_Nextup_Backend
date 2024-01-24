@@ -1,6 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateEventDto } from './dto/create-event.dto';
-import { UpdateEventDto } from './dto/update-event.dto';
 import { AbstractService } from 'modules/common/abstract.service';
 import { Event } from 'schemas/event.schema';
 import { InjectModel } from '@nestjs/mongoose';
@@ -42,8 +41,8 @@ export class EventsService extends AbstractService<Event> {
 
   async scheduleEmail(event) {
     const subject = 'Reminder';
-    const text = `Hi<p>Please, dont forget about the event that will be at .</p>`;
-    const html = `Hi<p>Please, dont forget about the event that will be ${event.date + ' ' + event.hour}.</p>`
+    const text = `Hi<p>Please, dont forget about the event that will be at.</p>`;
+    const html = `Hi<p>Please, dont forget about the event that will be at ${event.date + ' ' + event.hour}.</p><p>Your Nextup support team</p>`
     const sendDate = new Date(event.date)
     
     const hours = event.hour.toString().split(":")
