@@ -16,6 +16,7 @@ import { JwtAuthGuard } from 'modules/auth/guards/jwt.guard';
 import { User } from 'schemas/user.schema';
 import { ObjectId } from 'mongoose';
 import { UserGuard } from 'modules/auth/guards/user.guard';
+import { Cron } from '@nestjs/schedule';
 
 @Controller('users')
 export class UsersController {
@@ -24,6 +25,12 @@ export class UsersController {
   @Post()
   async create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
+  }
+
+  @Post('eventNotifications')
+  @Cron('* * * * * 2')
+  async newEventsNotification() {
+    return this.usersService.newEventsNotification();
   }
 
   @Get('me')
@@ -37,6 +44,16 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
+  @Get(':id/:token(*)')
+  @UseGuards(JwtAuthGuard)
+  async checkToken(
+    @Param('id') user_id: ObjectId,
+    @Param('token') hashed_token: string,
+  ) {
+    const user = await this.usersService.findById(user_id);
+    return this.usersService.checkToken(user, hashed_token);
+  }
+
   @Get(':id')
   @UseGuards(JwtAuthGuard)
   async findById(@Param('id') _id: ObjectId) {
@@ -45,8 +62,31 @@ export class UsersController {
 
   @Patch(':id')
   @UseGuards(JwtAuthGuard, UserGuard)
-  async update(@Param('id') _id: ObjectId, @Body() updateUserDto: UpdateUserDto) {
+  async update(
+    @Param('id') _id: ObjectId,
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
     return this.usersService.update(_id, updateUserDto);
+  }
+
+  @Patch('/me/update-password')
+  @UseGuards(JwtAuthGuard)
+  async updatePassword(
+    @GetCurrentUser() user: User,
+    @Body()
+    updateUserDto: {
+      current_password: string;
+      password: string;
+      confirm_password: string;
+    },
+  ) {
+    return this.usersService.updatePassword(user, updateUserDto);
+  }
+
+  @Post('me/reset-password')
+  @UseGuards(JwtAuthGuard)
+  async checkEmail(@Body() updateUserDto: { email: string }) {
+    return this.usersService.checkEmail(updateUserDto.email);
   }
 
   @Delete(':id')

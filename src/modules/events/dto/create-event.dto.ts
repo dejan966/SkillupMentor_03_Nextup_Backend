@@ -1,5 +1,5 @@
-import { IsNotEmpty, IsOptional } from "class-validator";
-import { User } from "schemas/user.schema";
+import { IsNotEmpty, IsOptional } from 'class-validator';
+import { User } from 'schemas/user.schema';
 
 export class CreateEventDto {
   @IsNotEmpty()

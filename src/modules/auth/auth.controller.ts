@@ -22,11 +22,30 @@ import { RegisterUserDto } from './dto/register-user.dto';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { GetCurrentUser } from 'decorators/get-current-user.decorator';
 import { JwtAuthGuard } from './guards/jwt.guard';
+import { UtilsService } from 'modules/utils/utils.service';
+import { UsersService } from 'modules/users/users.service';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly usersService: UsersService,
+  ) {}
 
+  @Post('welcomeEmail')
+  async welcomeEmail(@Body() body: { email: string }){
+    const subject = 'Welcome email';
+    const text = `Hi.<p>Thank you for your registration! We will notify you about any new events in your area.</p><p>Your Nextup support team</p>`;
+    const html = `Hi.<p>Thank you for your registration! We will notify you about any new events in your area.</p><p>Your Nextup support team</p>`;
+    return this.usersService.sendEmail({
+      from: 'Nextup Support <ultimate24208@gmail.com>',
+      to: body.email,
+      subject: subject,
+      text: text,
+      html: html
+    });
+  }
+  
   @Public()
   @Post('register')
   @HttpCode(HttpStatus.CREATED)

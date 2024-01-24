@@ -16,10 +16,10 @@ export class Event {
   @Prop({ required: true })
   location: string;
 
-  @Prop({ default: Date.now(), required: true })
+  @Prop({ required: true })
   date: string;
 
-  @Prop({ default: Date.now(), required: true })
+  @Prop({ required: true })
   hour: string;
 
   @Prop({ required: true })
@@ -34,7 +34,7 @@ export class Event {
   @Prop({ type: S.Types.ObjectId, ref: 'User' })
   @Type(() => User)
   creator: User;
-  
+
   @Prop({ type: [{ type: S.Types.ObjectId, ref: 'User' }] })
   booked_users: S.Types.ObjectId[];
 }
