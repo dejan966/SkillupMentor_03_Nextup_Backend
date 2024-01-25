@@ -8,6 +8,7 @@ import { User } from 'schemas/user.schema';
 import { UsersService } from 'modules/users/users.service';
 import { CronJob } from 'cron';
 import { SchedulerRegistry } from '@nestjs/schedule';
+import { UtilsService } from 'modules/utils/utils.service';
 
 @Injectable()
 export class EventsService extends AbstractService<Event> {
@@ -15,6 +16,7 @@ export class EventsService extends AbstractService<Event> {
     @InjectModel(Event.name)
     private eventModel: Model<Event>,
     private readonly usersService: UsersService,
+    private readonly utilsService: UtilsService,
     private readonly schedulerRegistry: SchedulerRegistry,
   ) {
     super(eventModel);
@@ -52,7 +54,7 @@ export class EventsService extends AbstractService<Event> {
     sendDate.setDate(sendDate.getDate() - 1);
 
     const job = new CronJob(sendDate, () => {
-      this.usersService.sendEmail({
+      this.utilsService.sendEmail({
         from: 'Nextup Support <ultimate24208@gmail.com>',
         to: user.email,
         date: sendDate,

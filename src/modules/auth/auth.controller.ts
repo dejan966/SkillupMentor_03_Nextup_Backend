@@ -30,6 +30,7 @@ export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly usersService: UsersService,
+    private readonly utilsService: UtilsService,
   ) {}
 
   @Post('welcomeEmail')
@@ -37,7 +38,7 @@ export class AuthController {
     const subject = 'Welcome email';
     const text = `Hi.<p>Thank you for your registration! We will notify you about any new events in your area.</p><p>Your Nextup support team</p>`;
     const html = `Hi.<p>Thank you for your registration! We will notify you about any new events in your area.</p><p>Your Nextup support team</p>`;
-    return this.usersService.sendEmail({
+    return this.utilsService.sendEmail({
       from: 'Nextup Support <ultimate24208@gmail.com>',
       to: body.email,
       subject: subject,

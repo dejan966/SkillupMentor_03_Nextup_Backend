@@ -1,9 +1,10 @@
 import { ISendMailOptions, MailerService } from '@nestjs-modules/mailer';
-import { InternalServerErrorException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 
+@Injectable()
 export class UtilsService {
-  constructor(private readonly mailerService: MailerService) {}
+  constructor(private mailerService: MailerService) {}
   async hash(data: string, salt = 10) {
     try {
       const generatedSalt = await bcrypt.genSalt(salt);
@@ -27,10 +28,9 @@ export class UtilsService {
     }
   }
 
-  sendEmail(options: ISendMailOptions) {
-    console.log(options);
+  async sendEmail(options: ISendMailOptions) {
     try {
-      const response = this.mailerService.sendMail(options);
+      const response = await this.mailerService.sendMail(options);
       return response;
     } catch (error) {
       console.error(error);

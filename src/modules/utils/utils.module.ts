@@ -1,10 +1,10 @@
 import { MailerModule } from '@nestjs-modules/mailer';
-import { Global, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { UtilsService } from './utils.service';
 import { ConfigModule } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
+import { MongooseModule } from '@nestjs/mongoose';
 
-@Global()
 @Module({
   imports: [
     ScheduleModule.forRoot(),
@@ -21,6 +21,7 @@ import { ScheduleModule } from '@nestjs/schedule';
         },
       },
     }),
+    MongooseModule.forRoot(process.env.M_DATABASE_URL),
   ],
   controllers: [],
   providers: [UtilsService],
