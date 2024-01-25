@@ -18,7 +18,7 @@ export abstract class AbstractService<T> {
     return this.model.find().exec();
   }
 
-  async findBy(condition): Promise<T> {
+  async findBy(condition) {
     try {
       return this.model.findOne(condition);
     } catch (error) {
@@ -29,11 +29,11 @@ export abstract class AbstractService<T> {
     }
   }
 
-  async findById(_id: ObjectId): Promise<T> {
+  async findById(_id: ObjectId) {
     return await this.model.findById(_id);
   }
 
-  async update(_id: ObjectId, updateDataDto): Promise<T> {
+  async update(_id: ObjectId, updateDataDto) {
     const data = await this.findById(_id);
     try {
       for (const key in data) {
