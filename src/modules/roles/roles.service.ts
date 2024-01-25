@@ -10,7 +10,7 @@ import { Model } from 'mongoose';
 export class RolesService extends AbstractService<Role> {
   constructor(
     @InjectModel(Role.name)
-    private roleModel: Model<Role>
+    private roleModel: Model<Role>,
   ) {
     super(roleModel);
   }

@@ -24,18 +24,21 @@ export class EventsService extends AbstractService<Event> {
 
   async addEvent(createEventDto: CreateEventDto, creator: User) {
     const createdEvent = new this.eventModel({ ...createEventDto, creator });
-    createdEvent.save();
-    return await this.usersService.addedEvent(creator, createdEvent);
+    const created = createdEvent.save();
+    await this.usersService.addedEvent(creator, createdEvent);
+    return created;
   }
 
   async bookUser(_id: ObjectId, user: User) {
     const event = await this.findById(_id);
     if (event.booked_users.length < event.max_users) {
-      event.booked_users.push(user._id);
-      await this.model.findOneAndUpdate({ _id }, event, {
-        returnNewDocument: true,
+      await event.updateOne({
+        $push: {
+          booked_users: user._id,
+        },
       });
-      return this.scheduleEmail(event, user);
+      this.scheduleEmail(event, user);
+      return event;
     } else if (event.booked_users.length === event.max_users) {
       throw new BadRequestException('Maximum amount of users reached.');
     }

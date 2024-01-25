@@ -9,13 +9,7 @@ import { RolesModule } from './roles/roles.module';
 import { UtilsModule } from './utils/utils.module';
 
 @Module({
-  imports: [
-    UtilsModule,
-    AuthModule,
-    UsersModule,
-    EventsModule,
-    RolesModule,
-  ],
+  imports: [UtilsModule, AuthModule, UsersModule, EventsModule, RolesModule],
   controllers: [AppController],
   providers: [AppService],
 })

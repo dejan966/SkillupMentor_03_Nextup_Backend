@@ -10,7 +10,6 @@ import { JwtService } from '@nestjs/jwt';
 import { JwtType } from 'interfaces/auth.interface';
 import { UtilsService } from 'modules/utils/utils.service';
 import { IJwtPayload } from 'interfaces/jwt-payload.interface';
-import { ISendMailOptions, MailerService } from '@nestjs-modules/mailer';
 
 @Injectable()
 export class UsersService extends AbstractService<User> {
@@ -20,7 +19,6 @@ export class UsersService extends AbstractService<User> {
     private configService: ConfigService,
     private jwtService: JwtService,
     private readonly utilsService: UtilsService,
-    private readonly mailerService: MailerService,
   ) {
     super(userModel);
   }
@@ -151,7 +149,11 @@ export class UsersService extends AbstractService<User> {
   }
 
   async addedEvent(user: User, event: Event) {
-    user.events.push(event._id);
-    return await this.model.updateOne({ _id: user._id }, user);
+    const creator = await this.findById(user._id);
+    return await creator.updateOne({
+      $push: {
+        events: event._id,
+      },
+    });
   }
 }

@@ -36,7 +36,7 @@ export class Event {
   creator: User;
 
   @Prop({ type: [{ type: SchemaM.Types.ObjectId, ref: 'User' }] })
-  booked_users: SchemaM.Types.ObjectId[];
+  booked_users: User[];
 }
 
 export const EventSchema = SchemaFactory.createForClass(Event);

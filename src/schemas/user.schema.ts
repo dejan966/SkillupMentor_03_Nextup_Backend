@@ -1,6 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Exclude, Transform } from 'class-transformer';
+import { Exclude, Transform, Type } from 'class-transformer';
 import { HydratedDocument, ObjectId, Schema as SchemaM } from 'mongoose';
+import { Event } from './event.schema';
+import { Role } from './role.schema';
 
 export type UserDocument = HydratedDocument<User>;
 
@@ -33,8 +35,12 @@ export class User {
   @Exclude()
   password_token: string;
 
+  @Prop({ type: SchemaM.Types.ObjectId, ref: 'Role' })
+  @Type(() => Role)
+  role: Role;
+
   @Prop({ type: [{ type: SchemaM.Types.ObjectId, ref: 'Event' }] })
-  events: SchemaM.Types.ObjectId[];
+  events: Event[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
