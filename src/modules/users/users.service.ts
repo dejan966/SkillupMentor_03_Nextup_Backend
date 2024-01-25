@@ -34,14 +34,13 @@ export class UsersService extends AbstractService<User> {
     return createdUser.save();
   }
 
-  
   async checkEmail(userEmail: string) {
     const user = await this.findBy({ email: userEmail });
     if (user) {
       return this.makeToken(user);
     }
   }
-  
+
   async checkToken(user: User, hashed_token: string) {
     if (
       await this.utilsService.compareHash(user.password_token, hashed_token)
@@ -57,7 +56,7 @@ export class UsersService extends AbstractService<User> {
     return false;
   }
 
-  async makeToken(user: User){
+  async makeToken(user: User) {
     const { password_token } = user;
 
     if (password_token) {
@@ -86,13 +85,13 @@ export class UsersService extends AbstractService<User> {
     const subject = 'Your password reset token';
     const text = `Hi.<p>Your password reset link is: </p><p>It expires in 15 minutes.</p><p>Your Nextup support team</p>`;
     const html = `Hi.<p>Your password reset link is <a href="http://localhost:3000/me/update-password?token=${hashed}">here</a>.</p><p>It expires in 15 minutes.</p><p>Your Nextup support team</p>`;
-    
+
     return this.sendEmail({
       from: 'Nextup Support <ultimate24208@gmail.com>',
       to: user.email,
       subject: subject,
       text: text,
-      html: html
+      html: html,
     });
   }
 
@@ -103,15 +102,15 @@ export class UsersService extends AbstractService<User> {
     const text = `Hi.<p>Theres new events available.</p><p>Your Nextup support team</p>`;
     const html = `Hi.<p>Theres new events available.</p><p>Your Nextup support team</p>`;
 
-    users.forEach(user => {
+    users.forEach((user) => {
       this.sendEmail({
         from: 'Nextup Support <ultimate24208@gmail.com>',
         to: user.email,
         subject: subject,
         text: text,
-        html: html
-      })
-    })
+        html: html,
+      });
+    });
   }
 
   async sendEmail(options: ISendMailOptions) {

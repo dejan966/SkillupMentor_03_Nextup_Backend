@@ -33,7 +33,7 @@ export class AuthController {
   ) {}
 
   @Post('welcomeEmail')
-  async welcomeEmail(@Body() body: { email: string }){
+  async welcomeEmail(@Body() body: { email: string }) {
     const subject = 'Welcome email';
     const text = `Hi.<p>Thank you for your registration! We will notify you about any new events in your area.</p><p>Your Nextup support team</p>`;
     const html = `Hi.<p>Thank you for your registration! We will notify you about any new events in your area.</p><p>Your Nextup support team</p>`;
@@ -42,10 +42,10 @@ export class AuthController {
       to: body.email,
       subject: subject,
       text: text,
-      html: html
+      html: html,
     });
   }
-  
+
   @Public()
   @Post('register')
   @HttpCode(HttpStatus.CREATED)

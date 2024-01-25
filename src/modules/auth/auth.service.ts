@@ -47,7 +47,6 @@ export class AuthService {
     });
     return user;
   }
-  
 
   async updateRtHash(userId: ObjectId, rt: string): Promise<void> {
     try {

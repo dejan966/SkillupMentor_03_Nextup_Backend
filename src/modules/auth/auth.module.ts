@@ -9,11 +9,13 @@ import { LocalStrategy } from './strategies/local.strategy';
 import { UtilsService } from 'modules/utils/utils.service';
 import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
 import { PassportModule } from '@nestjs/passport';
+import { UtilsModule } from 'modules/utils/utils.module';
 
 @Module({
   imports: [
     UsersModule,
     PassportModule,
+    UtilsModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -26,13 +28,7 @@ import { PassportModule } from '@nestjs/passport';
     }),
   ],
   controllers: [AuthController],
-  providers: [
-    AuthService,
-    UtilsService,
-    LocalStrategy,
-    JwtStrategy,
-    JwtRefreshStrategy,
-  ],
+  providers: [AuthService, LocalStrategy, JwtStrategy, JwtRefreshStrategy],
   exports: [AuthService],
 })
 export class AuthModule {}

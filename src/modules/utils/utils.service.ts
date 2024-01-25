@@ -1,11 +1,9 @@
-import { MailerService } from '@nestjs-modules/mailer';
+import { ISendMailOptions, MailerService } from '@nestjs-modules/mailer';
 import { InternalServerErrorException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 
 export class UtilsService {
-  constructor(
-    private readonly mailerService: MailerService,
-  ) {}
+  constructor(private readonly mailerService: MailerService) {}
   async hash(data: string, salt = 10) {
     try {
       const generatedSalt = await bcrypt.genSalt(salt);
@@ -29,15 +27,10 @@ export class UtilsService {
     }
   }
 
-  async sendEmail(email: string, subject: string, text: string, html: string) {
+  sendEmail(options: ISendMailOptions) {
+    console.log(options);
     try {
-      const response = await this.mailerService.sendMail({
-        from: 'Nextup Support <ultimate24208@gmail.com>',
-        to: email,
-        subject: subject,
-        text: text,
-        html: html,
-      });
+      const response = this.mailerService.sendMail(options);
       return response;
     } catch (error) {
       console.error(error);

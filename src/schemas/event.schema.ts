@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, ObjectId, Schema as S } from 'mongoose';
+import { HydratedDocument, ObjectId, Schema as SchemaM } from 'mongoose';
 import { User } from './user.schema';
 import { Transform, Type } from 'class-transformer';
 
@@ -31,12 +31,12 @@ export class Event {
   @Prop()
   image: string;
 
-  @Prop({ type: S.Types.ObjectId, ref: 'User' })
+  @Prop({ type: SchemaM.Types.ObjectId, ref: 'User' })
   @Type(() => User)
   creator: User;
 
-  @Prop({ type: [{ type: S.Types.ObjectId, ref: 'User' }] })
-  booked_users: S.Types.ObjectId[];
+  @Prop({ type: [{ type: SchemaM.Types.ObjectId, ref: 'User' }] })
+  booked_users: SchemaM.Types.ObjectId[];
 }
 
 export const EventSchema = SchemaFactory.createForClass(Event);
