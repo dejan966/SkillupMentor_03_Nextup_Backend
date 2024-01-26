@@ -23,13 +23,11 @@ import { LocalAuthGuard } from './guards/local-auth.guard';
 import { GetCurrentUser } from 'decorators/get-current-user.decorator';
 import { JwtAuthGuard } from './guards/jwt.guard';
 import { UtilsService } from 'modules/utils/utils.service';
-import { UsersService } from 'modules/users/users.service';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
-    private readonly usersService: UsersService,
     private readonly utilsService: UtilsService,
   ) {}
 

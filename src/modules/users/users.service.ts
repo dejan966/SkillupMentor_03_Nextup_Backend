@@ -145,14 +145,23 @@ export class UsersService extends AbstractService<User> {
   }
 
   async findAllUsers() {
-    return await this.userModel.find().populate('events');
+    return await this.userModel.find().populate('created_events');
   }
 
-  async addedEvent(user: User, event: Event) {
+  async createdEvent(user: User, event: Event) {
     const creator = await this.findById(user._id);
     return await creator.updateOne({
       $push: {
-        events: event._id,
+        created_events: event._id,
+      },
+    });
+  }
+  
+  async bookEvent(user: User, event: Event) {
+    const creator = await this.findById(user._id);
+    return await creator.updateOne({
+      $push: {
+        events_booked: event._id,
       },
     });
   }

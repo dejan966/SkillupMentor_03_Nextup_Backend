@@ -1,5 +1,6 @@
 import { IsOptional, IsNotEmpty, IsEmail, Matches } from 'class-validator';
 import { Match } from 'decorators/match.decorator';
+import { Role } from 'schemas/role.schema';
 
 export class CreateUserDto {
   @IsOptional()
@@ -30,4 +31,7 @@ export class CreateUserDto {
 
   @IsOptional()
   password_token?: string;
+  
+  @IsOptional()
+  role?: Role;
 }

@@ -25,7 +25,7 @@ export class EventsService extends AbstractService<Event> {
   async addEvent(createEventDto: CreateEventDto, creator: User) {
     const createdEvent = new this.eventModel({ ...createEventDto, creator });
     const created = createdEvent.save();
-    await this.usersService.addedEvent(creator, createdEvent);
+    await this.usersService.createdEvent(creator, createdEvent);
     return created;
   }
 
@@ -37,6 +37,7 @@ export class EventsService extends AbstractService<Event> {
           booked_users: user._id,
         },
       });
+      await this.usersService.bookEvent(user, event)
       this.scheduleEmail(event, user);
       return event;
     } else if (event.booked_users.length === event.max_users) {

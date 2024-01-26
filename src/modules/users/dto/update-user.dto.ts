@@ -1,5 +1,6 @@
 import { IsOptional, IsEmail, ValidateIf, Matches } from 'class-validator';
 import { Match } from 'decorators/match.decorator';
+import { Role } from 'schemas/role.schema';
 
 export class UpdateUserDto {
   @IsOptional()
@@ -38,4 +39,7 @@ export class UpdateUserDto {
 
   @IsOptional()
   password_token?: string;
+  
+  @IsOptional()
+  role?: Role;
 }

@@ -7,7 +7,7 @@ export class EventGuard implements CanActivate {
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
     const { user, params } = context.switchToHttp().getRequest();
-    for (const iterator of user.events) {
+    for (const iterator of user.created_events) {
       if (iterator.toString() === params.id) return true;
     }
     return false;

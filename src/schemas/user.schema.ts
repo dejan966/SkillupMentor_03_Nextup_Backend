@@ -35,12 +35,15 @@ export class User {
   @Exclude()
   password_token: string;
 
-  @Prop({ type: SchemaM.Types.ObjectId, ref: 'Role' })
+  @Prop({ type: SchemaM.Types.ObjectId, ref: 'Role', default: '65b2716d8bd2810fe3bfc9dd' })
   @Type(() => Role)
   role: Role;
 
   @Prop({ type: [{ type: SchemaM.Types.ObjectId, ref: 'Event' }] })
-  events: Event[];
+  created_events: Event[];
+  
+  @Prop({ type: [{ type: SchemaM.Types.ObjectId, ref: 'Event' }] })
+  events_booked: Event[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
