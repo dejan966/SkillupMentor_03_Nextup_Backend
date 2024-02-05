@@ -31,7 +31,7 @@ export class CreateUserDto {
 
   @IsOptional()
   password_token?: string;
-  
+
   @IsOptional()
   role?: Role;
 }

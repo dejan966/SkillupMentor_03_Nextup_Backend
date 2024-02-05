@@ -14,8 +14,8 @@ export abstract class AbstractService<T> {
     return createdData.save();
   }
 
-  async findAll(): Promise<T[]> {
-    return this.model.find().exec();
+  async findAll(populate: string): Promise<T[]> {
+    return this.model.find().populate(populate);
   }
 
   async findBy(condition) {

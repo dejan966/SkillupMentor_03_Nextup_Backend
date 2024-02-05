@@ -93,24 +93,6 @@ export class UsersService extends AbstractService<User> {
     });
   }
 
-  async newEventsNotification() {
-    const users = await this.findAll();
-
-    const subject = 'New events';
-    const text = `Hi.<p>Theres new events available.</p><p>Your Nextup support team</p>`;
-    const html = `Hi.<p>Theres new events available.</p><p>Your Nextup support team</p>`;
-
-    users.forEach((user) => {
-      this.utilsService.sendEmail({
-        from: 'Nextup Support <ultimate24208@gmail.com>',
-        to: user.email,
-        subject: subject,
-        text: text,
-        html: html,
-      });
-    });
-  }
-
   async updatePassword(
     user: User,
     updateUserDto: {
@@ -156,7 +138,7 @@ export class UsersService extends AbstractService<User> {
       },
     });
   }
-  
+
   async bookEvent(user: User, event: Event) {
     const creator = await this.findById(user._id);
     return await creator.updateOne({

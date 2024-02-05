@@ -38,7 +38,7 @@ export class EventsController {
 
   @Get()
   async findAll() {
-    return this.eventsService.findAll();
+    return this.eventsService.findAll('creator');
   }
 
   @Get(':id')

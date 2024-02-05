@@ -16,7 +16,6 @@ import { JwtAuthGuard } from 'modules/auth/guards/jwt.guard';
 import { User } from 'schemas/user.schema';
 import { ObjectId } from 'mongoose';
 import { UserGuard } from 'modules/auth/guards/user.guard';
-import { Cron } from '@nestjs/schedule';
 
 @Controller('users')
 export class UsersController {
@@ -27,12 +26,6 @@ export class UsersController {
     return this.usersService.create(createUserDto);
   }
 
-  @Post('eventNotifications')
-  @Cron('* * * * * 2')
-  async newEventsNotification() {
-    return this.usersService.newEventsNotification();
-  }
-
   @Get('me')
   @UseGuards(JwtAuthGuard)
   async getCurrentUser(@GetCurrentUser() user: User) {
@@ -41,7 +34,7 @@ export class UsersController {
 
   @Get()
   async findAll() {
-    return this.usersService.findAll();
+    return this.usersService.findAll('booked_users');
   }
 
   @Get(':id/:token(*)')

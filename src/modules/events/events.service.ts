@@ -37,7 +37,7 @@ export class EventsService extends AbstractService<Event> {
           booked_users: user._id,
         },
       });
-      await this.usersService.bookEvent(user, event)
+      await this.usersService.bookEvent(user, event);
       this.scheduleEmail(event, user);
       return event;
     } else if (event.booked_users.length === event.max_users) {

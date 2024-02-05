@@ -39,7 +39,7 @@ export class UpdateUserDto {
 
   @IsOptional()
   password_token?: string;
-  
+
   @IsOptional()
   role?: Role;
 }

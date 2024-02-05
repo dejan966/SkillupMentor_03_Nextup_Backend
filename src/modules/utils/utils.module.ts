@@ -3,7 +3,6 @@ import { Module } from '@nestjs/common';
 import { UtilsService } from './utils.service';
 import { ConfigModule } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
-import { MongooseModule } from '@nestjs/mongoose';
 
 @Module({
   imports: [
@@ -21,7 +20,6 @@ import { MongooseModule } from '@nestjs/mongoose';
         },
       },
     }),
-    MongooseModule.forRoot(process.env.M_DATABASE_URL),
   ],
   controllers: [],
   providers: [UtilsService],

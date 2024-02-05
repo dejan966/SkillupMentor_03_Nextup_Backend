@@ -28,10 +28,10 @@ export class AuthService {
     console.info('Validating user...');
     const user = await this.usersService.findBy({ email });
     if (!user) {
-      throw new BadRequestException('Invalid credentials');
+      throw new BadRequestException('User with this email doesnt exist');
     }
     if (!(await this.utilsService.compareHash(password, user.password))) {
-      throw new BadRequestException('Invalid credentials');
+      throw new BadRequestException('Invalid password');
     }
     console.info('User is valid');
     return user;
