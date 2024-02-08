@@ -3,7 +3,7 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { Model, ObjectId } from 'mongoose';
+import { Model } from 'mongoose';
 
 @Injectable()
 export abstract class AbstractService<T> {
@@ -14,7 +14,7 @@ export abstract class AbstractService<T> {
     return createdData.save();
   }
 
-  async findAll(populate: string): Promise<T[]> {
+  async findAll(populate = ''): Promise<T[]> {
     return this.model.find().populate(populate);
   }
 
@@ -29,11 +29,11 @@ export abstract class AbstractService<T> {
     }
   }
 
-  async findById(_id: ObjectId, p = '') {
+  async findById(_id: string, p = '') {
     return await this.model.findById(_id).populate(p);
   }
 
-  async update(_id: ObjectId, updateDataDto) {
+  async update(_id: string, updateDataDto) {
     const data = await this.findById(_id);
     try {
       for (const key in data) {
@@ -50,7 +50,7 @@ export abstract class AbstractService<T> {
     }
   }
 
-  async remove(_id: ObjectId) {
+  async remove(_id: string) {
     try {
       return this.model.findOneAndDelete({ _id });
     } catch (error) {

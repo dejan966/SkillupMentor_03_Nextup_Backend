@@ -1,13 +1,13 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, ObjectId } from 'mongoose';
 import { Transform } from 'class-transformer';
+import { HydratedDocument } from 'mongoose';
 
 export type RoleDocument = HydratedDocument<Role>;
 
 @Schema({ timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } })
 export class Role {
   @Transform(({ value }) => value.toString())
-  _id: ObjectId;
+  _id: string;
 
   @Prop({ required: true })
   name: string;

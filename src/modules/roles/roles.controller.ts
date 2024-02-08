@@ -6,11 +6,13 @@ import {
   Patch,
   Param,
   Delete,
+  UseInterceptors,
 } from '@nestjs/common';
 import { RolesService } from './roles.service';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
-import { ObjectId } from 'mongoose';
+import { Role } from 'schemas/role.schema';
+import MongooseClassSerializerInterceptor from 'interceptors/mongoose.interceptor';
 
 @Controller('roles')
 export class RolesController {
@@ -27,17 +29,17 @@ export class RolesController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: ObjectId) {
-    return this.rolesService.findById(id);
+  findOne(@Param('id') _id: string) {
+    return this.rolesService.findById(_id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: ObjectId, @Body() updateRoleDto: UpdateRoleDto) {
-    return this.rolesService.update(id, updateRoleDto);
+  update(@Param('id') _id: string, @Body() updateRoleDto: UpdateRoleDto) {
+    return this.rolesService.update(_id, updateRoleDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: ObjectId) {
-    return this.rolesService.remove(id);
+  remove(@Param('id') _id: string) {
+    return this.rolesService.remove(_id);
   }
 }

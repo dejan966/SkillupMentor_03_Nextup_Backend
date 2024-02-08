@@ -18,8 +18,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { GetCurrentUser } from 'decorators/get-current-user.decorator';
 import { JwtAuthGuard } from 'modules/auth/guards/jwt.guard';
-import { User } from 'schemas/user.schema';
-import { ObjectId } from 'mongoose';
+import { User, UserDocument } from 'schemas/user.schema';
 import { UserGuard } from 'modules/auth/guards/user.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { join } from 'path';
@@ -32,7 +31,6 @@ import {
 import MongooseClassSerializerInterceptor from 'interceptors/mongoose.interceptor';
 
 @Controller('users')
-@UseInterceptors(MongooseClassSerializerInterceptor(User))
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
@@ -57,7 +55,7 @@ export class UsersController {
   @HttpCode(HttpStatus.CREATED)
   async upload(
     @UploadedFile() file: Express.Multer.File,
-    @Param('id') id: ObjectId,
+    @Param('id') _id: string,
   ): Promise<User> {
     const filename = file?.filename;
 
@@ -67,7 +65,7 @@ export class UsersController {
     const imagesFolderPath = join(process.cwd(), 'uploads/avatars');
     const fullImagePath = join(imagesFolderPath + '/' + file.filename);
     if (await isFileExtensionSafe(fullImagePath)) {
-      return this.usersService.updateUserImageId(id, filename);
+      return this.usersService.updateUserImageId(_id, filename);
     }
     removeFile(fullImagePath);
     throw new BadRequestException('File content does not match extension!');
@@ -76,7 +74,7 @@ export class UsersController {
   @Get(':id/:token(*)')
   @UseGuards(JwtAuthGuard)
   async checkToken(
-    @Param('id') user_id: ObjectId,
+    @Param('id') user_id: string,
     @Param('token') hashed_token: string,
   ) {
     const user = await this.usersService.findById(user_id);
@@ -85,23 +83,20 @@ export class UsersController {
 
   @Get(':id')
   @UseGuards(JwtAuthGuard)
-  async findById(@Param('id') _id: ObjectId) {
+  async findById(@Param('id') _id: string) {
     return this.usersService.findById(_id, 'created_events');
   }
 
   @Patch(':id')
   @UseGuards(JwtAuthGuard, UserGuard)
-  async update(
-    @Param('id') _id: ObjectId,
-    @Body() updateUserDto: UpdateUserDto,
-  ) {
+  async update(@Param('id') _id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(_id, updateUserDto);
   }
 
   @Patch('/me/update-password')
   @UseGuards(JwtAuthGuard)
   async updatePassword(
-    @GetCurrentUser() user: User,
+    @GetCurrentUser() user: UserDocument,
     @Body()
     updateUserDto: {
       current_password: string;
@@ -120,7 +115,7 @@ export class UsersController {
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard, UserGuard)
-  async remove(@Param('id') _id: ObjectId) {
+  async remove(@Param('id') _id: string) {
     return this.usersService.remove(_id);
   }
 }

@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { User } from 'schemas/user.schema';
-import { Model, ObjectId } from 'mongoose';
+import { User, UserDocument } from 'schemas/user.schema';
+import { Model } from 'mongoose';
 import { AbstractService } from 'modules/common/abstract.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { Event } from 'schemas/event.schema';
@@ -15,7 +15,7 @@ import { IJwtPayload } from 'interfaces/jwt-payload.interface';
 export class UsersService extends AbstractService<User> {
   constructor(
     @InjectModel(User.name)
-    private userModel: Model<User>,
+    private userModel: Model<UserDocument>,
     private configService: ConfigService,
     private jwtService: JwtService,
     private readonly utilsService: UtilsService,
@@ -127,7 +127,7 @@ export class UsersService extends AbstractService<User> {
   }
 
   async findAllUsers() {
-    return await this.userModel.find().populate('created_events');
+    return await this.userModel.find();
   }
 
   async createdEvent(user: User, event: Event) {
@@ -148,13 +148,17 @@ export class UsersService extends AbstractService<User> {
     });
   }
 
-  async updateUserImageId(_id: ObjectId, avatar: string): Promise<User> {
+  async updateUserImageId(_id: string, avatar: string): Promise<User> {
     const user = await this.findById(_id);
     if (avatar === user.avatar) {
       throw new BadRequestException('Avatars have to be different.');
     }
-    user.avatar = avatar;
-    await this.userModel.updateOne({ _id }, user);
-    return user;
+    const updatedUser = await this.userModel.findOneAndUpdate(
+      { _id },
+      { $set: { avatar: avatar } },
+      { returnDocument: 'after' },
+    );
+
+    return updatedUser;
   }
 }

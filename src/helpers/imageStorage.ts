@@ -35,9 +35,9 @@ export const saveAvatarToStorage: Options = {
   },
 };
 
-export const saveLocationImageToStorage: Options = {
+export const saveEventImageToStorage: Options = {
   storage: diskStorage({
-    destination: './uploads/locations',
+    destination: './uploads/events',
     filename(req, file, callback) {
       // Create unique suffix
       const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
