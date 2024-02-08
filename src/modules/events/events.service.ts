@@ -23,10 +23,14 @@ export class EventsService extends AbstractService<Event> {
   }
 
   async addEvent(createEventDto: CreateEventDto, creator: User) {
-    const createdEvent = new this.eventModel({ ...createEventDto, creator });
-    const created = createdEvent.save();
-    await this.usersService.createdEvent(creator, createdEvent);
-    return created;
+    try {
+      const createdEvent = new this.eventModel({ ...createEventDto, creator });
+      const created = createdEvent.save();
+      await this.usersService.createdEvent(creator, createdEvent);
+      return created;
+    } catch (err) {
+      console.error('Something went wrong: ' + err);
+    }
   }
 
   async bookUser(_id: ObjectId, user: User) {

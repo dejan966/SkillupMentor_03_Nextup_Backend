@@ -44,7 +44,7 @@ export class EventsController {
   @Get(':id')
   @UseGuards(JwtAuthGuard)
   async findOne(@Param('id') _id: ObjectId) {
-    return this.eventsService.findById(_id);
+    return this.eventsService.findById(_id, 'creator');
   }
 
   @Patch(':id')

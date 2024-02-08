@@ -29,8 +29,8 @@ export abstract class AbstractService<T> {
     }
   }
 
-  async findById(_id: ObjectId) {
-    return await this.model.findById(_id);
+  async findById(_id: ObjectId, p = '') {
+    return await this.model.findById(_id).populate(p);
   }
 
   async update(_id: ObjectId, updateDataDto) {
