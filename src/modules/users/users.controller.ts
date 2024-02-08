@@ -7,6 +7,11 @@ import {
   Param,
   Delete,
   UseGuards,
+  BadRequestException,
+  HttpCode,
+  HttpStatus,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -16,8 +21,18 @@ import { JwtAuthGuard } from 'modules/auth/guards/jwt.guard';
 import { User } from 'schemas/user.schema';
 import { ObjectId } from 'mongoose';
 import { UserGuard } from 'modules/auth/guards/user.guard';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { join } from 'path';
+import { Express } from 'express';
+import {
+  saveAvatarToStorage,
+  isFileExtensionSafe,
+  removeFile,
+} from 'helpers/imageStorage';
+import MongooseClassSerializerInterceptor from 'interceptors/mongoose.interceptor';
 
 @Controller('users')
+@UseInterceptors(MongooseClassSerializerInterceptor(User))
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
@@ -34,7 +49,28 @@ export class UsersController {
 
   @Get()
   async findAll() {
-    return this.usersService.findAll('booked_users');
+    return this.usersService.findAll('created_events');
+  }
+
+  @Post('upload/:id')
+  @UseInterceptors(FileInterceptor('avatar', saveAvatarToStorage))
+  @HttpCode(HttpStatus.CREATED)
+  async upload(
+    @UploadedFile() file: Express.Multer.File,
+    @Param('id') id: ObjectId,
+  ): Promise<User> {
+    const filename = file?.filename;
+
+    if (!filename)
+      throw new BadRequestException('File must be a png, jpg/jpeg');
+
+    const imagesFolderPath = join(process.cwd(), 'uploads/avatars');
+    const fullImagePath = join(imagesFolderPath + '/' + file.filename);
+    if (await isFileExtensionSafe(fullImagePath)) {
+      return this.usersService.updateUserImageId(id, filename);
+    }
+    removeFile(fullImagePath);
+    throw new BadRequestException('File content does not match extension!');
   }
 
   @Get(':id/:token(*)')
@@ -50,7 +86,7 @@ export class UsersController {
   @Get(':id')
   @UseGuards(JwtAuthGuard)
   async findById(@Param('id') _id: ObjectId) {
-    return this.usersService.findById(_id);
+    return this.usersService.findById(_id, 'created_events');
   }
 
   @Patch(':id')

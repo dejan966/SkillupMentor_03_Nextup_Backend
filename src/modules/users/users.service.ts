@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from 'schemas/user.schema';
-import { Model } from 'mongoose';
+import { Model, ObjectId } from 'mongoose';
 import { AbstractService } from 'modules/common/abstract.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { Event } from 'schemas/event.schema';
@@ -146,5 +146,15 @@ export class UsersService extends AbstractService<User> {
         events_booked: event._id,
       },
     });
+  }
+
+  async updateUserImageId(_id: ObjectId, avatar: string): Promise<User> {
+    const user = await this.findById(_id);
+    if (avatar === user.avatar) {
+      throw new BadRequestException('Avatars have to be different.');
+    }
+    user.avatar = avatar;
+    await this.userModel.updateOne({ _id }, user);
+    return user;
   }
 }
