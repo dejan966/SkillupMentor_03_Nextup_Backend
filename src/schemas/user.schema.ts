@@ -2,13 +2,13 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Exclude, Transform, Type } from 'class-transformer';
 import { HydratedDocument, Schema as SchemaM } from 'mongoose';
 import { Event } from './event.schema';
-import { Role, RoleSchema } from './role.schema';
+import { Role } from './role.schema';
 
 export type UserDocument = HydratedDocument<User>;
 
 @Schema({ timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } })
 export class User {
-  @Transform(({ value }) => value.toString())
+  @Transform((value) => value.obj._id.toString())
   _id: string;
 
   @Prop({ default: 'default_profile.svg' })
@@ -35,26 +35,19 @@ export class User {
   @Exclude()
   password_token: string;
 
-  /*     @Prop({
+  @Prop({
     type: SchemaM.Types.ObjectId,
     ref: 'Role',
-    default: '65b2716d8bd2810fe3bfc9dd',
-  })
-  @Type(() => Role)
-  role: Role; */
-  @Prop({
-    type: RoleSchema,
-    ref: 'Role',
-    default: '65b2716d8bd2810fe3bfc9dd',
+    default: null,
   })
   @Type(() => Role)
   role: Role;
 
   @Prop({ type: [{ type: SchemaM.Types.ObjectId, ref: 'Event' }] })
-  created_events: Event[];
+  created_events: [Event];
 
   @Prop({ type: [{ type: SchemaM.Types.ObjectId, ref: 'Event' }] })
-  events_booked: Event[];
+  events_booked: [Event];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

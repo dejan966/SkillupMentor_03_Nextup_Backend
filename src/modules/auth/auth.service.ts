@@ -176,7 +176,7 @@ export class AuthService {
     );
     if (isRefreshTokenMatching) {
       return {
-        id: user._id,
+        _id: user._id,
         email: user.email,
       };
     }

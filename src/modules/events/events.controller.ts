@@ -31,6 +31,7 @@ import {
 import { join } from 'path';
 
 @Controller('events')
+@UseInterceptors(MongooseClassSerializerInterceptor(Event))
 export class EventsController {
   constructor(private readonly eventsService: EventsService) {}
 
@@ -46,12 +47,12 @@ export class EventsController {
   @Patch('bookUser/:id')
   @UseGuards(JwtAuthGuard, EventGuard)
   async addUser(@Param('id') _id: string, @GetCurrentUser() user: User) {
-    return this.eventsService.bookUser(_id, user);
+    return await this.eventsService.bookUser(_id, user);
   }
 
   @Get()
   async findAll() {
-    return this.eventsService.findAll('creator');
+    return await this.eventsService.findAll('creator');
   }
 
   @Post('upload/:id')
@@ -78,7 +79,7 @@ export class EventsController {
   @Get(':id')
   @UseGuards(JwtAuthGuard)
   async findOne(@Param('id') _id: string) {
-    return this.eventsService.findById(_id, 'creator');
+    return await this.eventsService.findById(_id, 'creator');
   }
 
   @Patch(':id')
@@ -87,12 +88,12 @@ export class EventsController {
     @Param('id') _id: string,
     @Body() updateEventDto: UpdateEventDto,
   ) {
-    return this.eventsService.update(_id, updateEventDto);
+    return await this.eventsService.update(_id, updateEventDto);
   }
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard, EventGuard)
   async remove(@Param('id') _id: string) {
-    return this.eventsService.remove(_id);
+    return await this.eventsService.remove(_id);
   }
 }

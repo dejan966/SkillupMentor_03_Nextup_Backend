@@ -15,6 +15,7 @@ import { Role } from 'schemas/role.schema';
 import MongooseClassSerializerInterceptor from 'interceptors/mongoose.interceptor';
 
 @Controller('roles')
+@UseInterceptors(MongooseClassSerializerInterceptor(Role))
 export class RolesController {
   constructor(private readonly rolesService: RolesService) {}
 
@@ -24,22 +25,22 @@ export class RolesController {
   }
 
   @Get()
-  findAll() {
-    return this.rolesService.findAll('');
+  async findAll() {
+    return await this.rolesService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') _id: string) {
-    return this.rolesService.findById(_id);
+  async findOne(@Param('id') _id: string) {
+    return await this.rolesService.findById(_id);
   }
 
   @Patch(':id')
-  update(@Param('id') _id: string, @Body() updateRoleDto: UpdateRoleDto) {
-    return this.rolesService.update(_id, updateRoleDto);
+  async update(@Param('id') _id: string, @Body() updateRoleDto: UpdateRoleDto) {
+    return await this.rolesService.update(_id, updateRoleDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') _id: string) {
-    return this.rolesService.remove(_id);
+  async remove(@Param('id') _id: string) {
+    return await this.rolesService.remove(_id);
   }
 }

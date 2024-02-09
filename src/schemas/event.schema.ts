@@ -7,7 +7,7 @@ export type EventDocument = HydratedDocument<Event>;
 
 @Schema({ timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } })
 export class Event {
-  @Transform(({ value }) => value.toString())
+  @Transform((value) => value.obj._id.toString())
   _id: string;
 
   @Prop({ required: true })
@@ -36,7 +36,7 @@ export class Event {
   creator: User;
 
   @Prop({ type: [{ type: SchemaM.Types.ObjectId, ref: 'User' }] })
-  booked_users: User[];
+  booked_users: [User];
 }
 
 export const EventSchema = SchemaFactory.createForClass(Event);

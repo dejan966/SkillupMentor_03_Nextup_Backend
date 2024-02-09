@@ -31,12 +31,13 @@ import {
 import MongooseClassSerializerInterceptor from 'interceptors/mongoose.interceptor';
 
 @Controller('users')
+@UseInterceptors(MongooseClassSerializerInterceptor(User))
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
   async create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+    return await this.usersService.createUser(createUserDto);
   }
 
   @Get('me')
@@ -47,7 +48,7 @@ export class UsersController {
 
   @Get()
   async findAll() {
-    return this.usersService.findAll('created_events');
+    return await this.usersService.findAll('created_events');
   }
 
   @Post('upload/:id')
@@ -84,13 +85,14 @@ export class UsersController {
   @Get(':id')
   @UseGuards(JwtAuthGuard)
   async findById(@Param('id') _id: string) {
-    return this.usersService.findById(_id, 'created_events');
+    const user = await this.usersService.findById(_id, 'created_events');
+    return user;
   }
 
   @Patch(':id')
   @UseGuards(JwtAuthGuard, UserGuard)
   async update(@Param('id') _id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(_id, updateUserDto);
+    return await this.usersService.update(_id, updateUserDto);
   }
 
   @Patch('/me/update-password')
@@ -104,18 +106,18 @@ export class UsersController {
       confirm_password: string;
     },
   ) {
-    return this.usersService.updatePassword(user, updateUserDto);
+    return await this.usersService.updatePassword(user, updateUserDto);
   }
 
   @Post('me/reset-password')
   @UseGuards(JwtAuthGuard)
   async checkEmail(@Body() updateUserDto: { email: string }) {
-    return this.usersService.checkEmail(updateUserDto.email);
+    return await this.usersService.checkEmail(updateUserDto.email);
   }
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard, UserGuard)
   async remove(@Param('id') _id: string) {
-    return this.usersService.remove(_id);
+    return await this.usersService.remove(_id);
   }
 }
