@@ -169,7 +169,7 @@ export class AuthService {
   }
 
   async getUserIfTokenMatches(refreshToken: string, userId: string) {
-    const user = await this.usersService.findById(userId);
+    const user = await this.usersService.findById(userId, 'created_events');
     const isRefreshTokenMatching = await this.utilsService.compareHash(
       refreshToken,
       user.refresh_token,

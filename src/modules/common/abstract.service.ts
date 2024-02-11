@@ -15,12 +15,12 @@ export abstract class AbstractService<T> {
   }
 
   async findAll(populate = ''): Promise<T[]> {
-    return this.model.find().populate(populate);
+    return this.model.find().populate(populate).exec();
   }
 
   async findBy(condition) {
     try {
-      return this.model.findOne(condition);
+      return await this.model.findOne(condition);
     } catch (error) {
       console.error(error);
       throw new InternalServerErrorException(
@@ -30,7 +30,7 @@ export abstract class AbstractService<T> {
   }
 
   async findById(_id: string, p = '') {
-    return await this.model.findById(_id).populate(p);
+    return await this.model.findById(_id).populate(p).exec();
   }
 
   async update(_id: string, updateDataDto) {

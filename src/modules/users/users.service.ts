@@ -96,34 +96,45 @@ export class UsersService extends AbstractService<User> {
   async updatePassword(
     user: User,
     updateUserDto: {
-      current_password: string;
       password: string;
+      new_password: string;
       confirm_password: string;
     },
   ): Promise<User> {
-    if (updateUserDto.password && updateUserDto.confirm_password) {
+    if (updateUserDto.new_password && updateUserDto.confirm_password) {
       if (
         !(await this.utilsService.compareHash(
-          updateUserDto.current_password,
+          updateUserDto.password,
           user.password,
         ))
       )
         throw new BadRequestException('Incorrect current password.');
-      if (updateUserDto.password !== updateUserDto.confirm_password)
+      if (updateUserDto.new_password !== updateUserDto.confirm_password)
         throw new BadRequestException('Passwords do not match.');
       if (
         await this.utilsService.compareHash(
-          updateUserDto.password,
+          updateUserDto.new_password,
           user.password,
         )
       )
         throw new BadRequestException(
           'New password cannot be the same as old password.',
         );
-      user.password = await this.utilsService.hash(updateUserDto.password);
     }
-    user.password_token = null;
-    return this.model.findOneAndUpdate({ _id: user._id }, user);
+
+    /* user.password = await this.utilsService.hash(updateUserDto.password);
+    user.password_token = null; */
+
+    return await this.model.findOneAndUpdate(
+      { _id: user._id },
+      {
+        $set: {
+          password: await this.utilsService.hash(updateUserDto.password),
+          password_token: null,
+        },
+      },
+      { returnDocument: 'after' },
+    );
   }
 
   async findAllUsers() {

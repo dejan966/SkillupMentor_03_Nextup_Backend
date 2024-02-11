@@ -46,7 +46,6 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ) {
     const { user } = req;
-
     const access_token = await this.authService.generateToken(
       user,
       JwtType.ACCESS_TOKEN,
@@ -66,7 +65,7 @@ export class AuthController {
     );
 
     try {
-      await this.authService.updateRtHash(user._id, refresh_token);
+      await this.authService.updateRtHash(user._id.toString(), refresh_token);
       res
         .setHeader('Set-Cookie', [access_token_cookie, refresh_token_cookie])
         .json(user);

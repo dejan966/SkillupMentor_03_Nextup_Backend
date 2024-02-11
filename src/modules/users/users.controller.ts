@@ -18,7 +18,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { GetCurrentUser } from 'decorators/get-current-user.decorator';
 import { JwtAuthGuard } from 'modules/auth/guards/jwt.guard';
-import { User, UserDocument } from 'schemas/user.schema';
+import { User } from 'schemas/user.schema';
 import { UserGuard } from 'modules/auth/guards/user.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { join } from 'path';
@@ -48,7 +48,7 @@ export class UsersController {
 
   @Get()
   async findAll() {
-    return await this.usersService.findAll('created_events');
+    return await this.usersService.findAll('created_events events_booked');
   }
 
   @Post('upload/:id')
@@ -85,7 +85,10 @@ export class UsersController {
   @Get(':id')
   @UseGuards(JwtAuthGuard)
   async findById(@Param('id') _id: string) {
-    const user = await this.usersService.findById(_id, 'created_events');
+    const user = await this.usersService.findById(
+      _id,
+      'created_events events_booked',
+    );
     return user;
   }
 
@@ -98,11 +101,11 @@ export class UsersController {
   @Patch('/me/update-password')
   @UseGuards(JwtAuthGuard)
   async updatePassword(
-    @GetCurrentUser() user: UserDocument,
+    @GetCurrentUser() user: User,
     @Body()
     updateUserDto: {
-      current_password: string;
       password: string;
+      new_password: string;
       confirm_password: string;
     },
   ) {
@@ -111,7 +114,7 @@ export class UsersController {
 
   @Post('me/reset-password')
   @UseGuards(JwtAuthGuard)
-  async checkEmail(@Body() updateUserDto: { email: string }) {
+  async checkEmail(@Body() updateUserDto: UpdateUserDto) {
     return await this.usersService.checkEmail(updateUserDto.email);
   }
 

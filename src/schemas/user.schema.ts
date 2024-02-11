@@ -38,16 +38,19 @@ export class User {
   @Prop({
     type: SchemaM.Types.ObjectId,
     ref: 'Role',
-    default: null,
+    default: '65b2716d8bd2810fe3bfc9dd',
   })
   @Type(() => Role)
   role: Role;
 
   @Prop({ type: [{ type: SchemaM.Types.ObjectId, ref: 'Event' }] })
-  created_events: [Event];
+  //addu sm to pa je prikazalo _id za event ampak zdj za creator v event prikaze error(transform.toString)
+  @Type(() => Event)
+  created_events: Event[];
 
   @Prop({ type: [{ type: SchemaM.Types.ObjectId, ref: 'Event' }] })
-  events_booked: [Event];
+  @Type(() => Event)
+  events_booked: Event[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

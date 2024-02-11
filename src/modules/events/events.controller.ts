@@ -45,14 +45,14 @@ export class EventsController {
   }
 
   @Patch('bookUser/:id')
-  @UseGuards(JwtAuthGuard, EventGuard)
+  @UseGuards(JwtAuthGuard)
   async addUser(@Param('id') _id: string, @GetCurrentUser() user: User) {
     return await this.eventsService.bookUser(_id, user);
   }
 
   @Get()
   async findAll() {
-    return await this.eventsService.findAll('creator');
+    return await this.eventsService.findAll('booked_users');
   }
 
   @Post('upload/:id')
