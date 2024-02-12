@@ -20,7 +20,6 @@ import { JwtAuthGuard } from 'modules/auth/guards/jwt.guard';
 import { EventGuard } from 'modules/auth/guards/event.guard';
 import { GetCurrentUser } from 'decorators/get-current-user.decorator';
 import { User } from 'schemas/user.schema';
-import MongooseClassSerializerInterceptor from 'interceptors/mongoose.interceptor';
 import { Event } from 'schemas/event.schema';
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
@@ -29,9 +28,9 @@ import {
   removeFile,
 } from 'helpers/imageStorage';
 import { join } from 'path';
+import { ObjectId } from 'mongoose';
 
 @Controller('events')
-@UseInterceptors(MongooseClassSerializerInterceptor(Event))
 export class EventsController {
   constructor(private readonly eventsService: EventsService) {}
 
@@ -46,13 +45,13 @@ export class EventsController {
 
   @Patch('bookUser/:id')
   @UseGuards(JwtAuthGuard)
-  async addUser(@Param('id') _id: string, @GetCurrentUser() user: User) {
+  async addUser(@Param('id') _id: ObjectId, @GetCurrentUser() user: User) {
     return await this.eventsService.bookUser(_id, user);
   }
 
   @Get()
   async findAll() {
-    return await this.eventsService.findAll('booked_users');
+    return await this.eventsService.findAll('creator booked_users');
   }
 
   @Post('upload/:id')
@@ -60,7 +59,7 @@ export class EventsController {
   @HttpCode(HttpStatus.CREATED)
   async upload(
     @UploadedFile() file: Express.Multer.File,
-    @Param('id') _id: string,
+    @Param('id') _id: ObjectId,
   ): Promise<Event> {
     const filename = file?.filename;
 
@@ -78,14 +77,14 @@ export class EventsController {
 
   @Get(':id')
   @UseGuards(JwtAuthGuard)
-  async findOne(@Param('id') _id: string) {
+  async findOne(@Param('id') _id: ObjectId) {
     return await this.eventsService.findById(_id, 'creator');
   }
 
   @Patch(':id')
   @UseGuards(JwtAuthGuard, EventGuard)
   async update(
-    @Param('id') _id: string,
+    @Param('id') _id: ObjectId,
     @Body() updateEventDto: UpdateEventDto,
   ) {
     return await this.eventsService.update(_id, updateEventDto);
@@ -93,7 +92,7 @@ export class EventsController {
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard, EventGuard)
-  async remove(@Param('id') _id: string) {
+  async remove(@Param('id') _id: ObjectId) {
     return await this.eventsService.remove(_id);
   }
 }

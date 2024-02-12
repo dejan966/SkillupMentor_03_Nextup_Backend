@@ -1,14 +1,14 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Schema as SchemaM } from 'mongoose';
+import { HydratedDocument, ObjectId, Schema as SchemaM } from 'mongoose';
 import { User } from './user.schema';
-import { Exclude, Transform, Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 
 export type EventDocument = HydratedDocument<Event>;
 
 @Schema({ timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } })
 export class Event {
-  @Transform((value) => value.obj._id.toString())
-  _id: string;
+  @Transform(({ value }) => value.toString())
+  _id: ObjectId;
 
   @Prop({ required: true })
   name: string;
@@ -33,12 +33,10 @@ export class Event {
 
   @Prop({ type: SchemaM.Types.ObjectId, ref: 'User' })
   @Type(() => User)
-  @Exclude()
   creator: User;
 
   @Prop({ type: [{ type: SchemaM.Types.ObjectId, ref: 'User' }] })
   @Type(() => User)
-  @Exclude()
   booked_users: User[];
 }
 

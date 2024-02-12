@@ -28,10 +28,9 @@ import {
   isFileExtensionSafe,
   removeFile,
 } from 'helpers/imageStorage';
-import MongooseClassSerializerInterceptor from 'interceptors/mongoose.interceptor';
+import { ObjectId } from 'mongoose';
 
 @Controller('users')
-@UseInterceptors(MongooseClassSerializerInterceptor(User))
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
@@ -48,7 +47,7 @@ export class UsersController {
 
   @Get()
   async findAll() {
-    return await this.usersService.findAll('created_events events_booked');
+    return await this.usersService.findAll('role created_events events_booked');
   }
 
   @Post('upload/:id')
@@ -56,7 +55,7 @@ export class UsersController {
   @HttpCode(HttpStatus.CREATED)
   async upload(
     @UploadedFile() file: Express.Multer.File,
-    @Param('id') _id: string,
+    @Param('id') _id: ObjectId,
   ): Promise<User> {
     const filename = file?.filename;
 
@@ -75,7 +74,7 @@ export class UsersController {
   @Get(':id/:token(*)')
   @UseGuards(JwtAuthGuard)
   async checkToken(
-    @Param('id') user_id: string,
+    @Param('id') user_id: ObjectId,
     @Param('token') hashed_token: string,
   ) {
     const user = await this.usersService.findById(user_id);
@@ -84,17 +83,20 @@ export class UsersController {
 
   @Get(':id')
   @UseGuards(JwtAuthGuard)
-  async findById(@Param('id') _id: string) {
+  async findById(@Param('id') _id: ObjectId) {
     const user = await this.usersService.findById(
       _id,
-      'created_events events_booked',
+      'role created_events events_booked',
     );
     return user;
   }
 
   @Patch(':id')
   @UseGuards(JwtAuthGuard, UserGuard)
-  async update(@Param('id') _id: string, @Body() updateUserDto: UpdateUserDto) {
+  async update(
+    @Param('id') _id: ObjectId,
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
     return await this.usersService.update(_id, updateUserDto);
   }
 
@@ -120,7 +122,7 @@ export class UsersController {
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard, UserGuard)
-  async remove(@Param('id') _id: string) {
+  async remove(@Param('id') _id: ObjectId) {
     return await this.usersService.remove(_id);
   }
 }

@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Exclude, Transform, Type } from 'class-transformer';
-import { HydratedDocument, Schema as SchemaM } from 'mongoose';
+import { HydratedDocument, ObjectId, Schema as SchemaM } from 'mongoose';
 import { Event } from './event.schema';
 import { Role } from './role.schema';
 
@@ -8,10 +8,10 @@ export type UserDocument = HydratedDocument<User>;
 
 @Schema({ timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } })
 export class User {
-  @Transform((value) => value.obj._id.toString())
-  _id: string;
+  @Transform(({ value }) => value.toString())
+  _id: ObjectId;
 
-  @Prop({ default: 'default_profile.svg' })
+  @Prop({ default: 'default-profile.png' })
   avatar: string;
 
   @Prop({ nullable: true })
@@ -20,7 +20,7 @@ export class User {
   @Prop({ nullable: true })
   last_name: string;
 
-  @Prop({ required: true })
+  @Prop({ required: true, unique: true })
   email: string;
 
   @Prop({ required: true })
@@ -44,7 +44,6 @@ export class User {
   role: Role;
 
   @Prop({ type: [{ type: SchemaM.Types.ObjectId, ref: 'Event' }] })
-  //addu sm to pa je prikazalo _id za event ampak zdj za creator v event prikaze error(transform.toString)
   @Type(() => Event)
   created_events: Event[];
 

@@ -13,6 +13,7 @@ import { UtilsService } from 'modules/utils/utils.service';
 import { CookieType, JwtType, TokenPayload } from 'interfaces/auth.interface';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
+import { ObjectId } from 'mongoose';
 
 @Injectable()
 export class AuthService {
@@ -47,7 +48,7 @@ export class AuthService {
     return user;
   }
 
-  async updateRtHash(userId: string, rt: string): Promise<void> {
+  async updateRtHash(userId: ObjectId, rt: string): Promise<void> {
     try {
       await this.usersService.update(userId, { refresh_token: rt });
     } catch (error) {
@@ -148,7 +149,7 @@ export class AuthService {
     return user;
   }
 
-  async signout(userId: string, res: Response): Promise<void> {
+  async signout(userId: ObjectId, res: Response): Promise<void> {
     const user = await this.usersService.findById(userId);
     await this.usersService.update(user._id, { refresh_token: null });
     try {
@@ -168,7 +169,7 @@ export class AuthService {
     ];
   }
 
-  async getUserIfTokenMatches(refreshToken: string, userId: string) {
+  async getUserIfTokenMatches(refreshToken: string, userId: ObjectId) {
     const user = await this.usersService.findById(userId, 'created_events');
     const isRefreshTokenMatching = await this.utilsService.compareHash(
       refreshToken,

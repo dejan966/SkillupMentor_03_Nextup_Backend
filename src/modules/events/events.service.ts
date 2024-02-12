@@ -3,7 +3,7 @@ import { CreateEventDto } from './dto/create-event.dto';
 import { AbstractService } from 'modules/common/abstract.service';
 import { Event } from 'schemas/event.schema';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, ObjectId } from 'mongoose';
 import { User } from 'schemas/user.schema';
 import { UsersService } from 'modules/users/users.service';
 import { CronJob } from 'cron';
@@ -33,7 +33,7 @@ export class EventsService extends AbstractService<Event> {
     }
   }
 
-  async updateEventImageId(_id: string, image: string): Promise<Event> {
+  async updateEventImageId(_id: ObjectId, image: string): Promise<Event> {
     const event = await this.findById(_id);
     if (image === event.image) {
       throw new BadRequestException('Images have to be different.');
@@ -48,7 +48,7 @@ export class EventsService extends AbstractService<Event> {
     return updatedEvent;
   }
 
-  async bookUser(_id: string, user: User) {
+  async bookUser(_id: ObjectId, user: User) {
     const event = await this.findById(_id);
     if (event.booked_users.length < event.max_users) {
       await event.updateOne({

@@ -8,11 +8,10 @@ import {
   Req,
   UseGuards,
   InternalServerErrorException,
-  UseInterceptors,
 } from '@nestjs/common';
 import { Public } from 'decorators/public.decorator';
 import { Response } from 'express';
-import { User, UserDocument } from 'schemas/user.schema';
+import { User } from 'schemas/user.schema';
 import {
   CookieType,
   JwtType,
@@ -23,10 +22,8 @@ import { RegisterUserDto } from './dto/register-user.dto';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { GetCurrentUser } from 'decorators/get-current-user.decorator';
 import { JwtAuthGuard } from './guards/jwt.guard';
-import MongooseClassSerializerInterceptor from 'interceptors/mongoose.interceptor';
 
 @Controller('auth')
-@UseInterceptors(MongooseClassSerializerInterceptor(User))
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
@@ -65,7 +62,7 @@ export class AuthController {
     );
 
     try {
-      await this.authService.updateRtHash(user._id.toString(), refresh_token);
+      await this.authService.updateRtHash(user._id, refresh_token);
       res
         .setHeader('Set-Cookie', [access_token_cookie, refresh_token_cookie])
         .json(user);
@@ -80,7 +77,7 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
   async signout(
-    @GetCurrentUser() userData: UserDocument,
+    @GetCurrentUser() userData: User,
     @Res({ passthrough: true }) res: Response,
   ) {
     return this.authService.signout(userData._id, res);
