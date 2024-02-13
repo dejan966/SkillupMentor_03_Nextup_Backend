@@ -54,7 +54,22 @@ export class EventsController {
     return await this.eventsService.findAll('creator booked_users');
   }
 
+  @Get('upcomingEvents')
+  @UseGuards(JwtAuthGuard)
+  async upcomingEvents() {
+    const events = await this.eventsService.upcomingEvents();
+    return events;
+  }
+
+  @Get('recentEvents')
+  @UseGuards(JwtAuthGuard)
+  async recentEvents() {
+    const events = await this.eventsService.recentEvents();
+    return events;
+  }
+
   @Post('upload/:id')
+  @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('image', saveEventImageToStorage))
   @HttpCode(HttpStatus.CREATED)
   async upload(

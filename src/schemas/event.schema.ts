@@ -17,7 +17,7 @@ export class Event {
   location: string;
 
   @Prop({ required: true })
-  date: string;
+  date: Date;
 
   @Prop({ required: true })
   hour: string;

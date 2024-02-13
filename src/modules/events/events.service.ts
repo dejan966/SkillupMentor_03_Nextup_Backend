@@ -48,6 +48,22 @@ export class EventsService extends AbstractService<Event> {
     return updatedEvent;
   }
 
+  async upcomingEvents() {
+    const allEvents = await this.findAll('creator booked_users');
+    const upcoming = allEvents.filter(
+      (event) => event.date.getTime() > new Date().getTime(),
+    );
+    return upcoming;
+  }
+
+  async recentEvents() {
+    const allEvents = await this.findAll('creator booked_users');
+    const recent = allEvents.filter(
+      (event) => event.date.getTime() < new Date().getTime(),
+    );
+    return recent;
+  }
+
   async bookUser(_id: ObjectId, user: User) {
     const event = await this.findById(_id);
     if (event.booked_users.length < event.max_users) {
