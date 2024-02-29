@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { CreateEventDto } from './dto/create-event.dto';
 import { AbstractService } from 'modules/common/abstract.service';
 import { Event } from 'schemas/event.schema';
@@ -48,12 +52,29 @@ export class EventsService extends AbstractService<Event> {
     return updatedEvent;
   }
 
-  async upcomingEvents() {
-    const allEvents = await this.findAll('creator booked_users');
-    const upcoming = allEvents.filter(
-      (event) => event.date.getTime() > new Date().getTime(),
-    );
-    return upcoming;
+  async upcomingEvents(page = 1) {
+    const take = 3;
+    try {
+      const data = await this.eventModel.aggregate([
+        {
+          $facet: {
+            totalData: [{ $match: {} }, { $skip: 3 }, { $limit: 3 }],
+            totalCount: [{ $count: 'count' }],
+          },
+        },
+      ]);
+      console.log(data.map((e) => console.log(e)));
+      const allEvents = await this.findAll('creator booked_users');
+      const upcoming = allEvents.filter(
+        (event) => event.date.getTime() > new Date().getTime(),
+      );
+      return upcoming;
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerErrorException(
+        'Something went wrong while searching for paginated elements.',
+      );
+    }
   }
 
   async recentEvents() {

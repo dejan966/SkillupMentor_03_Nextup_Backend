@@ -12,6 +12,7 @@ import {
   BadRequestException,
   HttpCode,
   HttpStatus,
+  Query,
 } from '@nestjs/common';
 import { EventsService } from './events.service';
 import { CreateEventDto } from './dto/create-event.dto';
@@ -55,14 +56,12 @@ export class EventsController {
   }
 
   @Get('upcomingEvents')
-  @UseGuards(JwtAuthGuard)
-  async upcomingEvents() {
-    const events = await this.eventsService.upcomingEvents();
+  async upcomingEvents(@Query('page') page: number) {
+    const events = await this.eventsService.upcomingEvents(page);
     return events;
   }
 
   @Get('recentEvents')
-  @UseGuards(JwtAuthGuard)
   async recentEvents() {
     const events = await this.eventsService.recentEvents();
     return events;
