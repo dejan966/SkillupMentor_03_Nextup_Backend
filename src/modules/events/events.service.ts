@@ -52,6 +52,28 @@ export class EventsService extends AbstractService<Event> {
     return updatedEvent;
   }
 
+  async currUserUpcomingEvents(user: User) {
+    const allEvents = await this.findAll('creator booked_users');
+
+    const upcoming = allEvents.filter(
+      (event) =>
+        event.booked_users.map((s) => s._id == user._id) &&
+        event.date.getTime() > new Date().getTime(),
+    );
+    return upcoming;
+  }
+
+  async currUserRecentEvents(user: User) {
+    const allEvents = await this.findAll('creator booked_users');
+
+    const recent = allEvents.filter(
+      (event) =>
+        event.booked_users.map((s) => s._id == user._id) &&
+        event.date.getTime() < new Date().getTime(),
+    );
+    return recent;
+  }
+
   async upcomingEvents(page = 1) {
     const take = 3;
     try {

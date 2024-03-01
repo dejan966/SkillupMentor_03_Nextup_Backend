@@ -55,6 +55,22 @@ export class EventsController {
     return await this.eventsService.findAll('creator booked_users');
   }
 
+  @Get('user/upcomingEvents')
+  @UseGuards(JwtAuthGuard)
+  async currUserUpcomingEvents(@GetCurrentUser() user: User) {
+    const upcomingEvents = await this.eventsService.currUserUpcomingEvents(
+      user,
+    );
+    return upcomingEvents;
+  }
+
+  @Get('user/recentEvents')
+  @UseGuards(JwtAuthGuard)
+  async currUserRecentEvents(@GetCurrentUser() user: User) {
+    const upcomingEvents = await this.eventsService.currUserRecentEvents(user);
+    return upcomingEvents;
+  }
+
   @Get('upcomingEvents')
   async upcomingEvents(@Query('page') page: number) {
     const events = await this.eventsService.upcomingEvents(page);
