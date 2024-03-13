@@ -37,6 +37,17 @@ export class EventsService extends AbstractService<Event> {
     }
   }
 
+  async eventSearch(searchValue: string, dateValue: string) {
+    const allEvents = await this.findAll('creator booked_users');
+    const search = allEvents.filter(
+      (event) =>
+        event.name.toLowerCase().includes(searchValue.toLowerCase()) &&
+        event.date.toISOString().substring(0, 10) ==
+          new Date(dateValue).toISOString().substring(0, 10),
+    );
+    return search;
+  }
+
   async updateEventImageId(_id: ObjectId, image: string): Promise<Event> {
     const event = await this.findById(_id);
     if (image === event.image) {
@@ -85,7 +96,7 @@ export class EventsService extends AbstractService<Event> {
           },
         },
       ]);
-      console.log(data.map((e) => console.log(e)));
+      //console.log(data.map((e) => console.log(e)));
       const allEvents = await this.findAll('creator booked_users');
       const upcoming = allEvents.filter(
         (event) => event.date.getTime() > new Date().getTime(),

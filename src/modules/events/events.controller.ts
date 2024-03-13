@@ -44,6 +44,14 @@ export class EventsController {
     return this.eventsService.addEvent(createEventDto, creator);
   }
 
+  @Get('search/:search/:date')
+  async eventSearch(
+    @Param('search') searchValue: string,
+    @Param('date') dateValue: string,
+  ) {
+    return this.eventsService.eventSearch(searchValue, dateValue);
+  }
+
   @Patch('bookUser/:id')
   @UseGuards(JwtAuthGuard)
   async addUser(@Param('id') _id: ObjectId, @GetCurrentUser() user: User) {
