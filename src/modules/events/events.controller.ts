@@ -44,12 +44,13 @@ export class EventsController {
     return this.eventsService.addEvent(createEventDto, creator);
   }
 
-  @Get('search/:search/:date')
+  @Get('search')
   async eventSearch(
-    @Param('search') searchValue: string,
-    @Param('date') dateValue: string,
+    @Query('search') searchValue: string,
+    @Query('date') dateValue: string,
+    @Query('page') pageNumber: number,
   ) {
-    return this.eventsService.eventSearch(searchValue, dateValue);
+    return this.eventsService.eventSearch(searchValue, dateValue, pageNumber);
   }
 
   @Patch('bookUser/:id')
@@ -80,8 +81,8 @@ export class EventsController {
   }
 
   @Get('upcomingEvents')
-  async upcomingEvents(@Query('page') page: number) {
-    const events = await this.eventsService.upcomingEvents(page);
+  async upcomingEvents() {
+    const events = await this.eventsService.upcomingEvents();
     return events;
   }
 

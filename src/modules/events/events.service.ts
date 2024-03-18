@@ -37,15 +37,28 @@ export class EventsService extends AbstractService<Event> {
     }
   }
 
-  async eventSearch(searchValue: string, dateValue: string) {
-    const allEvents = await this.findAll('creator booked_users');
-    const search = allEvents.filter(
-      (event) =>
-        event.name.toLowerCase().includes(searchValue.toLowerCase()) &&
-        event.date.toISOString().substring(0, 10) ==
-          new Date(dateValue).toISOString().substring(0, 10),
-    );
-    return search;
+  async eventSearch(searchValue: string, dateValue: string, pageNumber = 1) {
+    const take = 3;
+    const skip = take * (pageNumber - 1);
+
+    try {
+      const search = await this.eventModel
+        .find({
+          name: new RegExp(searchValue, 'i'),
+          date: {
+            $eq: new Date(dateValue),
+          },
+        })
+        .limit(take)
+        .skip(skip);
+
+      return search;
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerErrorException(
+        'Something went wrong while searching for paginated elements.',
+      );
+    }
   }
 
   async updateEventImageId(_id: ObjectId, image: string): Promise<Event> {
@@ -64,58 +77,37 @@ export class EventsService extends AbstractService<Event> {
   }
 
   async currUserUpcomingEvents(user: User) {
-    const allEvents = await this.findAll('creator booked_users');
+    const upcomingE = await this.eventModel.find({
+      booked_users: { $in: [user._id] },
+      date: { $gt: new Date() },
+    });
 
-    const upcoming = allEvents.filter(
-      (event) =>
-        event.booked_users.map((s) => s._id == user._id) &&
-        event.date.getTime() > new Date().getTime(),
-    );
-    return upcoming;
+    return upcomingE;
   }
 
   async currUserRecentEvents(user: User) {
-    const allEvents = await this.findAll('creator booked_users');
+    const recentE = await this.eventModel.find({
+      booked_users: { $in: [user._id] },
+      date: { $lt: new Date() },
+    });
 
-    const recent = allEvents.filter(
-      (event) =>
-        event.booked_users.map((s) => s._id == user._id) &&
-        event.date.getTime() < new Date().getTime(),
-    );
-    return recent;
+    return recentE;
   }
 
-  async upcomingEvents(page = 1) {
-    const take = 3;
-    try {
-      const data = await this.eventModel.aggregate([
-        {
-          $facet: {
-            totalData: [{ $match: {} }, { $skip: 3 }, { $limit: 3 }],
-            totalCount: [{ $count: 'count' }],
-          },
-        },
-      ]);
-      //console.log(data.map((e) => console.log(e)));
-      const allEvents = await this.findAll('creator booked_users');
-      const upcoming = allEvents.filter(
-        (event) => event.date.getTime() > new Date().getTime(),
-      );
-      return upcoming;
-    } catch (error) {
-      console.log(error);
-      throw new InternalServerErrorException(
-        'Something went wrong while searching for paginated elements.',
-      );
-    }
+  async upcomingEvents() {
+    const upcomingE = await this.eventModel.find({
+      date: { $gt: new Date() },
+    });
+
+    return upcomingE;
   }
 
   async recentEvents() {
-    const allEvents = await this.findAll('creator booked_users');
-    const recent = allEvents.filter(
-      (event) => event.date.getTime() < new Date().getTime(),
-    );
-    return recent;
+    const recentE = await this.eventModel.find({
+      date: { $lt: new Date() },
+    });
+
+    return recentE;
   }
 
   async bookUser(_id: ObjectId, user: User) {
