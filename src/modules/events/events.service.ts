@@ -13,6 +13,7 @@ import { UsersService } from 'modules/users/users.service';
 import { CronJob } from 'cron';
 import { SchedulerRegistry } from '@nestjs/schedule';
 import { UtilsService } from 'modules/utils/utils.service';
+import { PaginatedResult } from 'interfaces/paginated-result';
 
 @Injectable()
 export class EventsService extends AbstractService<Event> {
@@ -37,7 +38,11 @@ export class EventsService extends AbstractService<Event> {
     }
   }
 
-  async eventSearch(searchValue: string, dateValue: string, pageNumber = 1) {
+  async eventSearch(
+    searchValue: string,
+    dateValue: string,
+    pageNumber = 1,
+  ): Promise<PaginatedResult> {
     const take = 3;
     const skip = take * (pageNumber - 1);
 
@@ -52,7 +57,20 @@ export class EventsService extends AbstractService<Event> {
         .limit(take)
         .skip(skip);
 
-      return search;
+      const searchDocuments = await this.eventModel.countDocuments({
+        name: new RegExp(searchValue, 'i'),
+        date: {
+          $eq: new Date(dateValue),
+        },
+      });
+      return {
+        data: search,
+        meta: {
+          total: searchDocuments,
+          page: pageNumber,
+          last_page: Math.ceil(searchDocuments / take),
+        },
+      };
     } catch (error) {
       console.log(error);
       throw new InternalServerErrorException(
