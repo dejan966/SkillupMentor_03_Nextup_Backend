@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { CreateEventDto } from './dto/create-event.dto';
 import { AbstractService } from 'modules/common/abstract.service';
 import { Event } from 'schemas/event.schema';
@@ -33,6 +37,30 @@ export class EventsService extends AbstractService<Event> {
     }
   }
 
+  async eventSearch(searchValue: string, dateValue: string, pageNumber = 1) {
+    const take = 3;
+    const skip = take * (pageNumber - 1);
+
+    try {
+      const search = await this.eventModel
+        .find({
+          name: new RegExp(searchValue, 'i'),
+          date: {
+            $eq: new Date(dateValue),
+          },
+        })
+        .limit(take)
+        .skip(skip);
+
+      return search;
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerErrorException(
+        'Something went wrong while searching for paginated elements.',
+      );
+    }
+  }
+
   async updateEventImageId(_id: ObjectId, image: string): Promise<Event> {
     const event = await this.findById(_id);
     if (image === event.image) {
@@ -48,20 +76,38 @@ export class EventsService extends AbstractService<Event> {
     return updatedEvent;
   }
 
+  async currUserUpcomingEvents(user: User) {
+    const upcomingE = await this.eventModel.find({
+      booked_users: { $in: [user._id] },
+      date: { $gt: new Date() },
+    });
+
+    return upcomingE;
+  }
+
+  async currUserRecentEvents(user: User) {
+    const recentE = await this.eventModel.find({
+      booked_users: { $in: [user._id] },
+      date: { $lt: new Date() },
+    });
+
+    return recentE;
+  }
+
   async upcomingEvents() {
-    const allEvents = await this.findAll('creator booked_users');
-    const upcoming = allEvents.filter(
-      (event) => event.date.getTime() > new Date().getTime(),
-    );
-    return upcoming;
+    const upcomingE = await this.eventModel.find({
+      date: { $gt: new Date() },
+    });
+
+    return upcomingE;
   }
 
   async recentEvents() {
-    const allEvents = await this.findAll('creator booked_users');
-    const recent = allEvents.filter(
-      (event) => event.date.getTime() < new Date().getTime(),
-    );
-    return recent;
+    const recentE = await this.eventModel.find({
+      date: { $lt: new Date() },
+    });
+
+    return recentE;
   }
 
   async bookUser(_id: ObjectId, user: User) {

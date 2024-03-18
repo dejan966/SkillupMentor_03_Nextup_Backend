@@ -12,6 +12,7 @@ import {
   BadRequestException,
   HttpCode,
   HttpStatus,
+  Query,
 } from '@nestjs/common';
 import { EventsService } from './events.service';
 import { CreateEventDto } from './dto/create-event.dto';
@@ -43,6 +44,15 @@ export class EventsController {
     return this.eventsService.addEvent(createEventDto, creator);
   }
 
+  @Get('search')
+  async eventSearch(
+    @Query('search') searchValue: string,
+    @Query('date') dateValue: string,
+    @Query('page') pageNumber: number,
+  ) {
+    return this.eventsService.eventSearch(searchValue, dateValue, pageNumber);
+  }
+
   @Patch('bookUser/:id')
   @UseGuards(JwtAuthGuard)
   async addUser(@Param('id') _id: ObjectId, @GetCurrentUser() user: User) {
@@ -54,15 +64,29 @@ export class EventsController {
     return await this.eventsService.findAll('creator booked_users');
   }
 
-  @Get('upcomingEvents')
+  @Get('user/upcomingEvents')
   @UseGuards(JwtAuthGuard)
+  async currUserUpcomingEvents(@GetCurrentUser() user: User) {
+    const upcomingEvents = await this.eventsService.currUserUpcomingEvents(
+      user,
+    );
+    return upcomingEvents;
+  }
+
+  @Get('user/recentEvents')
+  @UseGuards(JwtAuthGuard)
+  async currUserRecentEvents(@GetCurrentUser() user: User) {
+    const upcomingEvents = await this.eventsService.currUserRecentEvents(user);
+    return upcomingEvents;
+  }
+
+  @Get('upcomingEvents')
   async upcomingEvents() {
     const events = await this.eventsService.upcomingEvents();
     return events;
   }
 
   @Get('recentEvents')
-  @UseGuards(JwtAuthGuard)
   async recentEvents() {
     const events = await this.eventsService.recentEvents();
     return events;
