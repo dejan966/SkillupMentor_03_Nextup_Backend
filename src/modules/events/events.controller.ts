@@ -46,7 +46,7 @@ export class EventsController {
 
   @Get('search')
   async eventSearch(
-    @Query('search') searchValue: string,
+    @Query('name') searchValue: string,
     @Query('date') dateValue: string,
     @Query('page') pageNumber: number,
   ) {

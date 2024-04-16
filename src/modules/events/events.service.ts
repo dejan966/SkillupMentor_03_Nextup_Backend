@@ -45,11 +45,11 @@ export class EventsService extends AbstractService<Event> {
   ): Promise<PaginatedResult> {
     const take = 3;
     const skip = take * (pageNumber - 1);
-
+    const searchString = '^' + searchValue;
     try {
       const search = await this.eventModel
         .find({
-          name: new RegExp(searchValue, 'i'),
+          name: new RegExp(searchString, 'i'),
           date: {
             $eq: new Date(dateValue),
           },
