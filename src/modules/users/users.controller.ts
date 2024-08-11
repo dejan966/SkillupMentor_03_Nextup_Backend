@@ -60,7 +60,6 @@ export class UsersController {
     @Param('id') _id: ObjectId,
   ): Promise<User> {
     const filename = file?.filename;
-
     if (!filename)
       throw new BadRequestException('File must be a png, jpg/jpeg');
 

@@ -49,7 +49,7 @@ export class EventsService extends AbstractService<Event> {
     try {
       const search = await this.eventModel
         .find({
-          name: new RegExp(searchString, 'i'),
+          location: new RegExp(searchString, 'i'),
           date: {
             $eq: new Date(dateValue),
           },
