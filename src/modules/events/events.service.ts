@@ -43,26 +43,37 @@ export class EventsService extends AbstractService<Event> {
     dateValue: string,
     pageNumber = 1,
   ): Promise<PaginatedResult> {
-    const take = 3;
-    const skip = take * (pageNumber - 1);
-    const searchString = '^' + searchValue;
-    try {
-      const search = await this.eventModel
-        .find({
-          location: new RegExp(searchString, 'i'),
-          date: {
-            $eq: new Date(dateValue),
-          },
-        })
-        .limit(take)
-        .skip(skip);
+    if (dateValue === '') {
+      return;
+    }
 
-      const searchDocuments = await this.eventModel.countDocuments({
-        name: new RegExp(searchValue, 'i'),
+    if (searchValue === '') {
+      const options = {
         date: {
           $eq: new Date(dateValue),
         },
-      });
+      };
+      return this.search(options, pageNumber);
+    }
+
+    const searchString = '^' + searchValue;
+    const options = {
+      location: new RegExp(searchString, 'i'),
+      date: {
+        $eq: new Date(dateValue),
+      },
+    };
+    return this.search(options, pageNumber);
+  }
+
+  async search(options: any, pageNumber: number) {
+    const take = 3;
+    const skip = take * (pageNumber - 1);
+
+    try {
+      const search = await this.eventModel.find(options).limit(take).skip(skip);
+
+      const searchDocuments = await this.eventModel.countDocuments(options);
       return {
         data: search,
         meta: {
