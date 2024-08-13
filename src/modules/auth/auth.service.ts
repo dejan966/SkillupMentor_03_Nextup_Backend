@@ -14,6 +14,7 @@ import { CookieType, JwtType, TokenPayload } from 'interfaces/auth.interface';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { ObjectId } from 'mongoose';
+import Logging from 'library/Logging';
 
 @Injectable()
 export class AuthService {
@@ -25,7 +26,7 @@ export class AuthService {
   ) {}
 
   async validateUser(email: string, password: string): Promise<User> {
-    console.info('Validating user...');
+    Logging.info('Validating user...');
     const user = await this.usersService.findBy({ email });
     if (!user) {
       throw new BadRequestException('User with this email doesnt exist');
@@ -33,7 +34,7 @@ export class AuthService {
     if (!(await this.utilsService.compareHash(password, user.password))) {
       throw new BadRequestException('Invalid password');
     }
-    console.info('User is valid');
+    Logging.info('User is valid');
     return user;
   }
 
@@ -81,7 +82,7 @@ export class AuthService {
           throw new BadRequestException('Access denied');
       }
     } catch (error) {
-      console.error(error);
+      Logging.error(error);
       throw new InternalServerErrorException(
         'Something went wrong while generating a new token.',
       );
@@ -108,7 +109,7 @@ export class AuthService {
       }
       return cookie;
     } catch (error) {
-      console.error(error);
+      Logging.error(error);
       /* if (error?.code === PostgresErrorCode.UniqueViolation) {
         throw new BadRequestException('User with that email already exists.');
       }
@@ -130,7 +131,7 @@ export class AuthService {
         secret: this.configService.get('JWT_REFRESH_SECRET'),
       });
     } catch (error) {
-      console.error(error);
+      Logging.error(error);
       throw new UnauthorizedException(
         'Something went wrong while refreshing tokens',
       );
@@ -141,7 +142,7 @@ export class AuthService {
     try {
       req.res.setHeader('Set-Cookie', cookie);
     } catch (error) {
-      console.error(error);
+      Logging.error(error);
       throw new InternalServerErrorException(
         'Something went wrong while setting cookies into the response header',
       );
@@ -155,7 +156,7 @@ export class AuthService {
     try {
       res.setHeader('Set-Cookie', this.getCookiesForSignOut()).sendStatus(200);
     } catch (error) {
-      console.error(error);
+      Logging.error(error);
       throw new InternalServerErrorException(
         'Something went wrong while setting cookies into response header',
       );

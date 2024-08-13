@@ -3,6 +3,7 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
+import Logging from 'library/Logging';
 import { Model, ObjectId } from 'mongoose';
 
 @Injectable()
@@ -22,7 +23,7 @@ export abstract class AbstractService<T> {
     try {
       return await this.model.findOne(condition);
     } catch (error) {
-      console.error(error);
+      Logging.error(error);
       throw new InternalServerErrorException(
         `Something went wrong while searching for an element with condition: ${condition}.`,
       );
@@ -54,7 +55,7 @@ export abstract class AbstractService<T> {
     try {
       return this.model.findOneAndDelete({ _id });
     } catch (error) {
-      console.error(error);
+      Logging.error(error);
       throw new InternalServerErrorException(
         'Something went wrong while deleting an item.',
       );

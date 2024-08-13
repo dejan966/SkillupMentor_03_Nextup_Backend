@@ -14,6 +14,7 @@ import { CronJob } from 'cron';
 import { SchedulerRegistry } from '@nestjs/schedule';
 import { UtilsService } from 'modules/utils/utils.service';
 import { PaginatedResult } from 'interfaces/paginated-result';
+import Logging from 'library/Logging';
 
 @Injectable()
 export class EventsService extends AbstractService<Event> {
@@ -34,7 +35,7 @@ export class EventsService extends AbstractService<Event> {
       await this.usersService.createdEvent(creator, createdEvent);
       return created;
     } catch (err) {
-      console.error('Something went wrong: ' + err);
+      Logging.error('Something went wrong: ' + err);
     }
   }
 
@@ -83,7 +84,7 @@ export class EventsService extends AbstractService<Event> {
         },
       };
     } catch (error) {
-      console.log(error);
+      Logging.error(error);
       throw new InternalServerErrorException(
         'Something went wrong while searching for paginated elements.',
       );

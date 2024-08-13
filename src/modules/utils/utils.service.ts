@@ -10,7 +10,7 @@ export class UtilsService {
       const generatedSalt = await bcrypt.genSalt(salt);
       return bcrypt.hash(data, generatedSalt);
     } catch (error) {
-      console.error(error);
+      Logging.error(error);
       throw new InternalServerErrorException(
         'Something went wrong while hashing the password',
       );
@@ -21,7 +21,7 @@ export class UtilsService {
     try {
       return bcrypt.compare(data, encryptedData);
     } catch (error) {
-      console.error(error);
+      Logging.error(error);
       throw new InternalServerErrorException(
         'Something went wrong while comparing the hash.',
       );
@@ -33,7 +33,7 @@ export class UtilsService {
       const response = await this.mailerService.sendMail(options);
       return response;
     } catch (error) {
-      console.error(error);
+      Logging.error(error);
       throw new InternalServerErrorException(
         'Something went wrong while sending the email.',
       );

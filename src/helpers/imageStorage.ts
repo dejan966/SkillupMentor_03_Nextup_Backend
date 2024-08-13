@@ -1,5 +1,6 @@
 const FileType = import('file-type');
 import fs from 'fs';
+import Logging from 'library/Logging';
 import { diskStorage, Options } from 'multer';
 import { extname } from 'path';
 
@@ -79,6 +80,6 @@ export const removeFile = (fullFilePath: string): void => {
   try {
     fs.unlinkSync(fullFilePath);
   } catch (error) {
-    console.error(error);
+    Logging.error(error);
   }
 };
