@@ -51,6 +51,11 @@ export class UsersController {
     return await this.usersService.findAll('role created_events events_booked');
   }
 
+  @Get()
+  async findAllF() {
+    return await this.usersService.findAllF();
+  }
+
   @Post('upload/:id')
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('avatar', saveAvatarToStorage))

@@ -1,6 +1,7 @@
 import { ISendMailOptions, MailerService } from '@nestjs-modules/mailer';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
+import Logging from 'library/Logging';
 
 @Injectable()
 export class UtilsService {

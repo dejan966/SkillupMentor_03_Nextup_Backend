@@ -22,6 +22,8 @@ import { RegisterUserDto } from './dto/register-user.dto';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { GetCurrentUser } from 'decorators/get-current-user.decorator';
 import { JwtAuthGuard } from './guards/jwt.guard';
+import { auth, firestore } from 'firebase-admin';
+import Logging from 'library/Logging';
 
 @Controller('auth')
 export class AuthController {
@@ -32,6 +34,55 @@ export class AuthController {
   @HttpCode(HttpStatus.CREATED)
   async register(@Body() body: RegisterUserDto): Promise<User> {
     return this.authService.register(body);
+  }
+
+  @Public()
+  @Post('firebaseLogin')
+  @HttpCode(HttpStatus.OK)
+  async firebaseLogin(@Body() body, @Res({ passthrough: true }) res: Response) {
+    const user_uid = body.uid;
+    const display_name = body.displayName;
+    const photo_url = body.photoURL;
+    const email = body.email;
+    const access_token = body.stsTokenManager.accessToken;
+    const refresh_token = body.stsTokenManager.refreshToken;
+
+    const userDB = firestore().collection('users');
+    const checkUser = auth().getUser(user_uid);
+    if (checkUser) {
+      try {
+        res.cookie('access_token', access_token).json(body);
+        return;
+      } catch (err) {
+        Logging.error(err);
+        throw new InternalServerErrorException(
+          'Something went wrong while setting cookies into response header',
+        );
+      }
+    }
+
+    const docData = {
+      uid: user_uid,
+      displayName: display_name,
+      photoURL: photo_url,
+      email: email,
+      refreshToken: refresh_token,
+    };
+    userDB.add(docData);
+    try {
+      res.cookie('access_token', access_token).json(body);
+    } catch (err) {
+      Logging.error(err);
+      throw new InternalServerErrorException(
+        'Something went wrong while setting cookies into response header',
+      );
+    }
+  }
+
+  @Post('firebaseSignout')
+  @HttpCode(HttpStatus.OK)
+  async firebaseSignout(@Res({ passthrough: true }) res: Response) {
+    return this.authService.firebaseSignout(res);
   }
 
   @Public()

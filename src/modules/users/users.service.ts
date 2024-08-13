@@ -10,6 +10,7 @@ import { JwtService } from '@nestjs/jwt';
 import { JwtType } from 'interfaces/auth.interface';
 import { UtilsService } from 'modules/utils/utils.service';
 import { IJwtPayload } from 'interfaces/jwt-payload.interface';
+import * as admin from 'firebase-admin';
 
 @Injectable()
 export class UsersService extends AbstractService<User> {
@@ -132,6 +133,16 @@ export class UsersService extends AbstractService<User> {
       },
       { returnDocument: 'after' },
     );
+  }
+
+  async findAllF() {
+    const db = admin.firestore();
+    const snapshot = await db.collection('users').get();
+    const data = [];
+    snapshot.forEach((doc) => {
+      data.push({ id: doc.id, ...doc.data() });
+    });
+    return data;
   }
 
   async findAllUsers() {
