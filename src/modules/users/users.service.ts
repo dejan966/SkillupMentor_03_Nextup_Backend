@@ -12,6 +12,7 @@ import { UtilsService } from 'modules/utils/utils.service';
 import { IJwtPayload } from 'interfaces/jwt-payload.interface';
 import * as admin from 'firebase-admin';
 import { DecodedIdToken } from 'firebase-admin/auth';
+import { auth } from 'firebase-admin';
 
 @Injectable()
 export class UsersService extends AbstractService<User> {
@@ -39,6 +40,11 @@ export class UsersService extends AbstractService<User> {
     if (user) {
       return this.makeToken(user);
     }
+  }
+
+  async getFirebaseUserById(uid: string) {
+    const user = auth().getUser(uid);
+    return user;
   }
 
   async checkToken(user: User, hashed_token: string) {

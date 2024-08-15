@@ -30,17 +30,19 @@ import {
 } from 'helpers/imageStorage';
 import { join } from 'path';
 import { ObjectId } from 'mongoose';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('events')
 export class EventsController {
   constructor(private readonly eventsService: EventsService) {}
 
   @Post()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(AuthGuard(['firebase', 'jwt2']))
   async create(
     @Body() createEventDto: CreateEventDto,
-    @GetCurrentUser() creator: User,
+    @GetCurrentUser() creator,
   ) {
+    console.log('ws');
     return this.eventsService.addEvent(createEventDto, creator);
   }
 

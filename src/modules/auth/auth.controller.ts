@@ -22,12 +22,16 @@ import { RegisterUserDto } from './dto/register-user.dto';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { GetCurrentUser } from 'decorators/get-current-user.decorator';
 import { JwtAuthGuard } from './guards/jwt.guard';
-import { auth, firestore } from 'firebase-admin';
+import { firestore } from 'firebase-admin';
 import Logging from 'library/Logging';
+import { UsersService } from 'modules/users/users.service';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private usersService: UsersService,
+  ) {}
 
   @Public()
   @Post('register')
@@ -48,7 +52,7 @@ export class AuthController {
     const refresh_token = body.stsTokenManager.refreshToken;
 
     const userDB = firestore().collection('users');
-    const checkUser = auth().getUser(user_uid);
+    const checkUser = this.usersService.getFirebaseUserById(user_uid);
     if (checkUser) {
       try {
         res.cookie('access_token', access_token).json(body);
@@ -60,7 +64,6 @@ export class AuthController {
         );
       }
     }
-
     const docData = {
       uid: user_uid,
       displayName: display_name,
