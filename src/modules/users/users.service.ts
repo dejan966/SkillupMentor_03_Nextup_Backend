@@ -11,6 +11,7 @@ import { JwtType } from 'interfaces/auth.interface';
 import { UtilsService } from 'modules/utils/utils.service';
 import { IJwtPayload } from 'interfaces/jwt-payload.interface';
 import * as admin from 'firebase-admin';
+import { DecodedIdToken } from 'firebase-admin/auth';
 
 @Injectable()
 export class UsersService extends AbstractService<User> {
@@ -133,6 +134,11 @@ export class UsersService extends AbstractService<User> {
       },
       { returnDocument: 'after' },
     );
+  }
+
+  async decodeToken(token: string): Promise<DecodedIdToken> {
+    const decoded = await admin.auth().verifyIdToken(token);
+    return decoded;
   }
 
   async findAllF() {
