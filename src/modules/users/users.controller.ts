@@ -30,6 +30,7 @@ import {
 } from 'helpers/imageStorage';
 import { ObjectId } from 'mongoose';
 import { AuthGuard } from '@nestjs/passport';
+import { RoleGuard } from 'modules/auth/guards/role.guard';
 
 @Controller('users')
 export class UsersController {
@@ -47,7 +48,7 @@ export class UsersController {
   }
 
   @Get()
-  @UseGuards(AuthGuard(['jwt', 'firebase']))
+  @UseGuards(AuthGuard(['jwt', 'firebase']), RoleGuard)
   async findAll() {
     return await this.usersService.findAll('role created_events events_booked');
   }
