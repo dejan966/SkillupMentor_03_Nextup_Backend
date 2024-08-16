@@ -10,6 +10,9 @@ import { JwtService } from '@nestjs/jwt';
 import { JwtType } from 'interfaces/auth.interface';
 import { UtilsService } from 'modules/utils/utils.service';
 import { IJwtPayload } from 'interfaces/jwt-payload.interface';
+import * as admin from 'firebase-admin';
+import { DecodedIdToken } from 'firebase-admin/auth';
+import { FirebaseUserDto } from './dto/firebase-user.dto';
 
 @Injectable()
 export class UsersService extends AbstractService<User> {
@@ -32,11 +35,25 @@ export class UsersService extends AbstractService<User> {
     return createdUser.save();
   }
 
+  async createFirebaseUser(firebaseUserDto: FirebaseUserDto) {
+    const user = await this.findBy({ email: firebaseUserDto.email });
+    if (user) {
+      throw new BadRequestException('User with that email already exists.');
+    }
+    const createdUser = new this.userModel(firebaseUserDto);
+    return createdUser.save();
+  }
+
   async checkEmail(userEmail: string) {
     const user = await this.findBy({ email: userEmail });
     if (user) {
       return this.makeToken(user);
     }
+  }
+
+  async getFirebaseUserByUid(uid: string) {
+    const user = await this.findBy({ uid: uid });
+    return user;
   }
 
   async checkToken(user: User, hashed_token: string) {
@@ -132,6 +149,11 @@ export class UsersService extends AbstractService<User> {
       },
       { returnDocument: 'after' },
     );
+  }
+
+  async decodeToken(token: string): Promise<DecodedIdToken> {
+    const decoded = await admin.auth().verifyIdToken(token);
+    return decoded;
   }
 
   async findAllUsers() {

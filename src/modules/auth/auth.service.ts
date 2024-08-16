@@ -150,6 +150,17 @@ export class AuthService {
     return user;
   }
 
+  async firebaseSignout(res: Response): Promise<void> {
+    try {
+      res.clearCookie('access_token').sendStatus(200);
+    } catch (error) {
+      Logging.error(error);
+      throw new InternalServerErrorException(
+        'Something went wrong while setting cookies into response header',
+      );
+    }
+  }
+
   async signout(userId: ObjectId, res: Response): Promise<void> {
     const user = await this.usersService.findById(userId);
     await this.usersService.update(user._id, { refresh_token: null });

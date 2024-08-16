@@ -21,17 +21,76 @@ import { AuthService } from './auth.service';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { GetCurrentUser } from 'decorators/get-current-user.decorator';
-import { JwtAuthGuard } from './guards/jwt.guard';
+import Logging from 'library/Logging';
+import { UsersService } from 'modules/users/users.service';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private usersService: UsersService,
+  ) {}
 
   @Public()
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
   async register(@Body() body: RegisterUserDto): Promise<User> {
     return this.authService.register(body);
+  }
+
+  @Public()
+  @Post('firebaseLogin')
+  @HttpCode(HttpStatus.OK)
+  async firebaseLogin(@Body() body, @Res({ passthrough: true }) res: Response) {
+    const user_uid = body.uid;
+    const display_name = body.displayName;
+    const photo_url = body.photoURL;
+    const email = body.email;
+    const access_token = body.stsTokenManager.accessToken;
+    const refresh_token = body.stsTokenManager.refreshToken;
+
+    const name = display_name.split(' ')[0];
+    const surname = display_name.split(' ')[1];
+
+    const user = await this.usersService.getFirebaseUserByUid(user_uid);
+    if (user) {
+      try {
+        res.cookie('access_token', access_token).json(user);
+      } catch (err) {
+        Logging.error(err);
+        throw new InternalServerErrorException(
+          'Something went wrong while setting cookies into response header',
+        );
+      }
+    }
+    const newUser = {
+      uid: user_uid,
+      email: email,
+      first_name: name,
+      last_name: surname,
+      refresh_token: refresh_token,
+      avatar: photo_url,
+      password: 'Geslo1234!',
+      confirm_password: 'Geslo1234!',
+      type: 'Google User',
+    };
+
+    const u = await this.usersService.createFirebaseUser(newUser);
+
+    try {
+      res.cookie('access_token', access_token).json(u);
+    } catch (err) {
+      Logging.error(err);
+      throw new InternalServerErrorException(
+        'Something went wrong while setting cookies into response header',
+      );
+    }
+  }
+  @Post('firebaseSignout')
+  @HttpCode(HttpStatus.OK)
+  async firebaseSignout(@Res({ passthrough: true }) res: Response) {
+    return this.authService.firebaseSignout(res);
   }
 
   @Public()
@@ -74,7 +133,7 @@ export class AuthController {
   }
 
   @Post('signout')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(AuthGuard(['jwt', 'firebase']))
   @HttpCode(HttpStatus.OK)
   async signout(
     @GetCurrentUser() userData: User,

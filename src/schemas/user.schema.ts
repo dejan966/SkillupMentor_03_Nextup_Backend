@@ -20,8 +20,14 @@ export class User {
   @Prop({ nullable: true })
   last_name: string;
 
+  @Prop({ nullable: true })
+  uid: string;
+
   @Prop({ required: true, unique: true })
   email: string;
+
+  @Prop({ default: 'Nextup User' })
+  type: string;
 
   @Prop({ required: true })
   @Exclude()
