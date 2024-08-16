@@ -12,7 +12,7 @@ import { UtilsService } from 'modules/utils/utils.service';
 import { IJwtPayload } from 'interfaces/jwt-payload.interface';
 import * as admin from 'firebase-admin';
 import { DecodedIdToken } from 'firebase-admin/auth';
-import { auth } from 'firebase-admin';
+import { FirebaseUserDto } from './dto/firebase-user.dto';
 
 @Injectable()
 export class UsersService extends AbstractService<User> {
@@ -35,6 +35,15 @@ export class UsersService extends AbstractService<User> {
     return createdUser.save();
   }
 
+  async createFirebaseUser(firebaseUserDto: FirebaseUserDto) {
+    const user = await this.findBy({ email: firebaseUserDto.email });
+    if (user) {
+      throw new BadRequestException('User with that email already exists.');
+    }
+    const createdUser = new this.userModel(firebaseUserDto);
+    return createdUser.save();
+  }
+
   async checkEmail(userEmail: string) {
     const user = await this.findBy({ email: userEmail });
     if (user) {
@@ -42,8 +51,8 @@ export class UsersService extends AbstractService<User> {
     }
   }
 
-  async getFirebaseUserById(uid: string) {
-    const user = auth().getUser(uid);
+  async getFirebaseUserByUid(uid: string) {
+    const user = await this.findBy({ uid: uid });
     return user;
   }
 
@@ -145,16 +154,6 @@ export class UsersService extends AbstractService<User> {
   async decodeToken(token: string): Promise<DecodedIdToken> {
     const decoded = await admin.auth().verifyIdToken(token);
     return decoded;
-  }
-
-  async findAllF() {
-    const db = admin.firestore();
-    const snapshot = await db.collection('users').get();
-    const data = [];
-    snapshot.forEach((doc) => {
-      data.push({ id: doc.id, ...doc.data() });
-    });
-    return data;
   }
 
   async findAllUsers() {

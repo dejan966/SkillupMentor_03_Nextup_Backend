@@ -21,10 +21,9 @@ import { AuthService } from './auth.service';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { GetCurrentUser } from 'decorators/get-current-user.decorator';
-import { JwtAuthGuard } from './guards/jwt.guard';
-import { firestore } from 'firebase-admin';
 import Logging from 'library/Logging';
 import { UsersService } from 'modules/users/users.service';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('auth')
 export class AuthController {
@@ -51,27 +50,9 @@ export class AuthController {
     const access_token = body.stsTokenManager.accessToken;
     const refresh_token = body.stsTokenManager.refreshToken;
 
-    const userDB = firestore().collection('users');
-    const checkUser = this.usersService.getFirebaseUserById(user_uid);
-    if (checkUser) {
-      try {
-        res.cookie('access_token', access_token).json(body);
-        return;
-      } catch (err) {
-        Logging.error(err);
-        throw new InternalServerErrorException(
-          'Something went wrong while setting cookies into response header',
-        );
-      }
-    }
-    const docData = {
-      uid: user_uid,
-      displayName: display_name,
-      photoURL: photo_url,
-      email: email,
-      refreshToken: refresh_token,
-    };
-    userDB.add(docData);
+    const name = display_name.split(' ')[0];
+    const surname = display_name.split(' ')[1];
+
     try {
       res.cookie('access_token', access_token).json(body);
     } catch (err) {
@@ -80,8 +61,21 @@ export class AuthController {
         'Something went wrong while setting cookies into response header',
       );
     }
-  }
 
+    const user = {
+      uid: user_uid,
+      email: email,
+      first_name: name,
+      last_name: surname,
+      refresh_token: refresh_token,
+      avatar: photo_url,
+      password: 'Geslo1234!',
+      confirm_password: 'Geslo1234!',
+      type: 'Google User',
+    };
+
+    await this.usersService.createFirebaseUser(user);
+  }
   @Post('firebaseSignout')
   @HttpCode(HttpStatus.OK)
   async firebaseSignout(@Res({ passthrough: true }) res: Response) {
@@ -128,7 +122,7 @@ export class AuthController {
   }
 
   @Post('signout')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(AuthGuard(['jwt', 'firebase']))
   @HttpCode(HttpStatus.OK)
   async signout(
     @GetCurrentUser() userData: User,

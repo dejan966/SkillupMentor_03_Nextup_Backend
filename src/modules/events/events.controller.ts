@@ -17,7 +17,6 @@ import {
 import { EventsService } from './events.service';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
-import { JwtAuthGuard } from 'modules/auth/guards/jwt.guard';
 import { EventGuard } from 'modules/auth/guards/event.guard';
 import { GetCurrentUser } from 'decorators/get-current-user.decorator';
 import { User } from 'schemas/user.schema';
@@ -37,12 +36,11 @@ export class EventsController {
   constructor(private readonly eventsService: EventsService) {}
 
   @Post()
-  @UseGuards(AuthGuard(['firebase', 'jwt2']))
+  @UseGuards(AuthGuard(['jwt', 'firebase']))
   async create(
     @Body() createEventDto: CreateEventDto,
-    @GetCurrentUser() creator,
+    @GetCurrentUser() creator: User,
   ) {
-    console.log('ws');
     return this.eventsService.addEvent(createEventDto, creator);
   }
 
@@ -56,7 +54,7 @@ export class EventsController {
   }
 
   @Patch('bookUser/:id')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(AuthGuard(['jwt', 'firebase']))
   async addUser(@Param('id') _id: ObjectId, @GetCurrentUser() user: User) {
     return await this.eventsService.bookUser(_id, user);
   }
@@ -67,7 +65,7 @@ export class EventsController {
   }
 
   @Get('user/upcomingEvents')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(AuthGuard(['jwt', 'firebase']))
   async currUserUpcomingEvents(@GetCurrentUser() user: User) {
     const upcomingEvents = await this.eventsService.currUserUpcomingEvents(
       user,
@@ -76,7 +74,7 @@ export class EventsController {
   }
 
   @Get('user/recentEvents')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(AuthGuard(['jwt', 'firebase']))
   async currUserRecentEvents(@GetCurrentUser() user: User) {
     const upcomingEvents = await this.eventsService.currUserRecentEvents(user);
     return upcomingEvents;
@@ -95,7 +93,7 @@ export class EventsController {
   }
 
   @Post('upload/:id')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(AuthGuard(['jwt', 'firebase']))
   @UseInterceptors(FileInterceptor('image', saveEventImageToStorage))
   @HttpCode(HttpStatus.CREATED)
   async upload(
@@ -117,13 +115,12 @@ export class EventsController {
   }
 
   @Get(':id')
-  @UseGuards(JwtAuthGuard)
   async findOne(@Param('id') _id: ObjectId) {
     return await this.eventsService.findById(_id, 'creator');
   }
 
   @Patch(':id')
-  @UseGuards(JwtAuthGuard, EventGuard)
+  @UseGuards(AuthGuard(['jwt', 'firebase']), EventGuard)
   async update(
     @Param('id') _id: ObjectId,
     @Body() updateEventDto: UpdateEventDto,
@@ -132,7 +129,7 @@ export class EventsController {
   }
 
   @Delete(':id')
-  @UseGuards(JwtAuthGuard, EventGuard)
+  @UseGuards(AuthGuard(['jwt', 'firebase']), EventGuard)
   async remove(@Param('id') _id: ObjectId) {
     return await this.eventsService.remove(_id);
   }

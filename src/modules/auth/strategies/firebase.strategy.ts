@@ -19,7 +19,7 @@ export class FirebaseStrategy extends PassportStrategy(Strategy, 'firebase') {
   }
 
   async validate(payload) {
-    const user = await this.usersService.getFirebaseUserById(payload.sub);
+    const user = await this.usersService.getFirebaseUserByUid(payload.sub);
     return user;
   }
 }

@@ -29,6 +29,7 @@ import {
   removeFile,
 } from 'helpers/imageStorage';
 import { ObjectId } from 'mongoose';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('users')
 export class UsersController {
@@ -40,24 +41,19 @@ export class UsersController {
   }
 
   @Get('me')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(AuthGuard(['jwt', 'firebase']))
   async getCurrentUser(@GetCurrentUser() user: User) {
     return user;
   }
 
   @Get()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(AuthGuard(['jwt', 'firebase']))
   async findAll() {
     return await this.usersService.findAll('role created_events events_booked');
   }
 
-  @Get()
-  async findAllF() {
-    return await this.usersService.findAllF();
-  }
-
   @Post('upload/:id')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(AuthGuard(['jwt', 'firebase']))
   @UseInterceptors(FileInterceptor('avatar', saveAvatarToStorage))
   @HttpCode(HttpStatus.CREATED)
   async upload(
@@ -88,7 +84,7 @@ export class UsersController {
   }
 
   @Get(':id')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(AuthGuard(['jwt', 'firebase']))
   async findById(@Param('id') _id: ObjectId) {
     const user = await this.usersService.findById(
       _id,
@@ -98,7 +94,7 @@ export class UsersController {
   }
 
   @Patch(':id')
-  @UseGuards(JwtAuthGuard, UserGuard)
+  @UseGuards(AuthGuard(['jwt', 'firebase']), UserGuard)
   async update(
     @Param('id') _id: ObjectId,
     @Body() updateUserDto: UpdateUserDto,

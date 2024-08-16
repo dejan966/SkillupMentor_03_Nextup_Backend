@@ -8,7 +8,7 @@ import { UsersService } from '../../users/users.service';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy, 'jwt2') {
+export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor(
     private usersService: UsersService,
     configService: ConfigService,

@@ -28,7 +28,7 @@ export class EventsService extends AbstractService<Event> {
     super(eventModel);
   }
 
-  async addEvent(createEventDto: CreateEventDto, creator) {
+  async addEvent(createEventDto: CreateEventDto, creator: User) {
     try {
       const createdEvent = new this.eventModel({ ...createEventDto, creator });
       const created = createdEvent.save();

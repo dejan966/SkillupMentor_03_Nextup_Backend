@@ -23,6 +23,9 @@ export class User {
   @Prop({ required: true, unique: true })
   email: string;
 
+  @Prop({ default: 'Nextup User' })
+  type: string;
+
   @Prop({ required: true })
   @Exclude()
   password: string;
