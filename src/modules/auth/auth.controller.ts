@@ -53,16 +53,18 @@ export class AuthController {
     const name = display_name.split(' ')[0];
     const surname = display_name.split(' ')[1];
 
-    try {
-      res.cookie('access_token', access_token).json(body);
-    } catch (err) {
-      Logging.error(err);
-      throw new InternalServerErrorException(
-        'Something went wrong while setting cookies into response header',
-      );
+    const user = await this.usersService.getFirebaseUserByUid(user_uid);
+    if (user) {
+      try {
+        res.cookie('access_token', access_token).json(user);
+      } catch (err) {
+        Logging.error(err);
+        throw new InternalServerErrorException(
+          'Something went wrong while setting cookies into response header',
+        );
+      }
     }
-
-    const user = {
+    const newUser = {
       uid: user_uid,
       email: email,
       first_name: name,
@@ -74,7 +76,16 @@ export class AuthController {
       type: 'Google User',
     };
 
-    await this.usersService.createFirebaseUser(user);
+    const u = await this.usersService.createFirebaseUser(newUser);
+
+    try {
+      res.cookie('access_token', access_token).json(u);
+    } catch (err) {
+      Logging.error(err);
+      throw new InternalServerErrorException(
+        'Something went wrong while setting cookies into response header',
+      );
+    }
   }
   @Post('firebaseSignout')
   @HttpCode(HttpStatus.OK)
