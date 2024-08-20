@@ -12,6 +12,7 @@ import {
   HttpStatus,
   UploadedFile,
   UseInterceptors,
+  Query,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -49,8 +50,11 @@ export class UsersController {
 
   @Get()
   @UseGuards(AuthGuard(['jwt', 'firebase']), RoleGuard)
-  async findAll() {
-    return await this.usersService.findAll('role created_events events_booked');
+  async findAll(@Query('page') pageNumber: number) {
+    return await this.usersService.findPaginate(
+      pageNumber,
+      'role created_events events_booked',
+    );
   }
 
   @Post('upload/:id')

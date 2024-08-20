@@ -7,7 +7,8 @@ export class UserGuard implements CanActivate {
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
     const { user, params } = context.switchToHttp().getRequest();
-    if (user._id.toString() === params.id) return true;
+    if (user._id.toString() === params.id || user.role.name === 'ADMIN')
+      return true;
     return false;
   }
 }

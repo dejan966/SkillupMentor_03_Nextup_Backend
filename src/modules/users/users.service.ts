@@ -171,7 +171,6 @@ export class UsersService extends AbstractService<User> {
 
   async bookEvent(user: User, event: Event) {
     const creator = await this.findById(user._id);
-    console.log(creator);
     return await creator.updateOne({
       $push: {
         events_booked: event._id,

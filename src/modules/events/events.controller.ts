@@ -60,8 +60,11 @@ export class EventsController {
   }
 
   @Get()
-  async findAll() {
-    return await this.eventsService.findAll('creator booked_users');
+  async findAll(@Query('page') pageNumber: number) {
+    return await this.eventsService.findPaginate(
+      pageNumber,
+      'creator booked_users',
+    );
   }
 
   @Get('user/upcomingEvents')

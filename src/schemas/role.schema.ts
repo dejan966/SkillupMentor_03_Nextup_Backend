@@ -7,7 +7,7 @@ export type RoleDocument = HydratedDocument<Role>;
 @Schema({ timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } })
 export class Role {
   @Transform(({ value }) => value.toString())
-  _id: string;
+  _id: ObjectId;
 
   @Prop({ required: true })
   name: string;

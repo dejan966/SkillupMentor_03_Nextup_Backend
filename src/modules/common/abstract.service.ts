@@ -19,6 +19,25 @@ export abstract class AbstractService<T> {
     return await this.model.find().populate(populate).exec();
   }
 
+  async findPaginate(pageNumber: number, populate = '') {
+    const take = 15;
+    const skip = take * (pageNumber - 1);
+    const search = await this.model
+      .find()
+      .populate(populate)
+      .limit(take)
+      .skip(skip);
+    const searchDocuments = await this.model.countDocuments();
+    return {
+      data: search,
+      meta: {
+        total: searchDocuments,
+        page: pageNumber,
+        last_page: Math.ceil(searchDocuments / take),
+      },
+    };
+  }
+
   async findBy(condition) {
     try {
       return await this.model.findOne(condition);
