@@ -25,7 +25,7 @@ export class Event {
   @Prop({ required: true })
   max_users: number;
 
-  @Prop({ nullable: true })
+  @Prop({ default: '' })
   description: string;
 
   @Prop({ nullable: true })
