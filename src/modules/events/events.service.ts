@@ -51,7 +51,7 @@ export class EventsService extends AbstractService<Event> {
     if (searchValue === '') {
       const options = {
         date: {
-          $eq: new Date(dateValue),
+          $eq: new Date(dateValue).toISOString().substring(0, 10),
         },
       };
       return this.search(options, pageNumber);
@@ -61,7 +61,7 @@ export class EventsService extends AbstractService<Event> {
     const options = {
       location: new RegExp(searchString, 'i'),
       date: {
-        $eq: new Date(dateValue),
+        $eq: new Date(dateValue).toISOString().substring(0, 10),
       },
     };
     return this.search(options, pageNumber);
@@ -109,7 +109,7 @@ export class EventsService extends AbstractService<Event> {
   async currUserUpcomingEvents(user: User) {
     const upcomingE = await this.eventModel.find({
       booked_users: { $in: [user._id] },
-      date: { $gt: new Date() },
+      date: { $gt: new Date().toISOString().substring(0, 10) },
     });
 
     return upcomingE;
@@ -118,7 +118,7 @@ export class EventsService extends AbstractService<Event> {
   async currUserRecentEvents(user: User) {
     const recentE = await this.eventModel.find({
       booked_users: { $in: [user._id] },
-      date: { $lt: new Date() },
+      date: { $lt: new Date().toISOString().substring(0, 10) },
     });
 
     return recentE;
@@ -126,7 +126,7 @@ export class EventsService extends AbstractService<Event> {
 
   async upcomingEvents() {
     const upcomingE = await this.eventModel.find({
-      date: { $gt: new Date() },
+      date: { $gt: new Date().toISOString().substring(0, 10) },
     });
 
     return upcomingE;
@@ -134,7 +134,7 @@ export class EventsService extends AbstractService<Event> {
 
   async recentEvents() {
     const recentE = await this.eventModel.find({
-      date: { $lt: new Date() },
+      date: { $lt: new Date().toISOString().substring(0, 10) },
     });
 
     return recentE;
