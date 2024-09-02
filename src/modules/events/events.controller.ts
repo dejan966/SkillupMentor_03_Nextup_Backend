@@ -54,7 +54,7 @@ export class EventsController {
   }
 
   @Patch('bookUser/:id')
-  @UseGuards(AuthGuard(['jwt', 'firebase']))
+  @UseGuards(AuthGuard(['jwt', 'firebase']), EventGuard)
   async addUser(@Param('id') _id: ObjectId, @GetCurrentUser() user: User) {
     return await this.eventsService.bookUser(_id, user);
   }
@@ -96,7 +96,7 @@ export class EventsController {
   }
 
   @Post('upload/:id')
-  @UseGuards(AuthGuard(['jwt', 'firebase']))
+  @UseGuards(AuthGuard(['jwt', 'firebase']), EventGuard)
   @UseInterceptors(FileInterceptor('image', saveEventImageToStorage))
   @HttpCode(HttpStatus.CREATED)
   async upload(

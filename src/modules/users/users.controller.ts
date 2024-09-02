@@ -38,6 +38,7 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
+  @UseGuards(RoleGuard)
   async create(@Body() createUserDto: CreateUserDto) {
     return await this.usersService.createUser(createUserDto);
   }
@@ -58,7 +59,7 @@ export class UsersController {
   }
 
   @Post('upload/:id')
-  @UseGuards(AuthGuard(['jwt', 'firebase']))
+  @UseGuards(AuthGuard(['jwt', 'firebase']), UserGuard)
   @UseInterceptors(FileInterceptor('avatar', saveAvatarToStorage))
   @HttpCode(HttpStatus.CREATED)
   async upload(
@@ -79,7 +80,7 @@ export class UsersController {
   }
 
   @Get(':id/:token(*)')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, UserGuard)
   async checkToken(
     @Param('id') user_id: ObjectId,
     @Param('token') hashed_token: string,
@@ -89,7 +90,7 @@ export class UsersController {
   }
 
   @Get(':id')
-  @UseGuards(AuthGuard(['jwt', 'firebase']))
+  @UseGuards(AuthGuard(['jwt', 'firebase']), UserGuard)
   async findById(@Param('id') _id: ObjectId) {
     const user = await this.usersService.findById(
       _id,
