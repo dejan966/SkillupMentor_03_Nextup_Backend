@@ -32,15 +32,25 @@ import {
 import { ObjectId } from 'mongoose';
 import { AuthGuard } from '@nestjs/passport';
 import { RoleGuard } from 'modules/auth/guards/role.guard';
+import { UtilsService } from 'modules/utils/utils.service';
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private utilsService: UtilsService,
+  ) {}
 
   @Post()
-  @UseGuards(RoleGuard)
+  @UseGuards(AuthGuard(['jwt', 'firebase']), RoleGuard)
   async create(@Body() createUserDto: CreateUserDto) {
-    return await this.usersService.createUser(createUserDto);
+    const hashedPassword: string = await this.utilsService.hash(
+      createUserDto.password,
+    );
+    return await this.usersService.createUser({
+      ...createUserDto,
+      password: hashedPassword,
+    });
   }
 
   @Get('me')
@@ -105,7 +115,13 @@ export class UsersController {
     @Param('id') _id: ObjectId,
     @Body() updateUserDto: UpdateUserDto,
   ) {
-    return await this.usersService.update(_id, updateUserDto);
+    const hashedPassword: string = await this.utilsService.hash(
+      updateUserDto.password,
+    );
+    return await this.usersService.update(_id, {
+      ...updateUserDto,
+      password: hashedPassword,
+    });
   }
 
   @Patch('/me/update-password')
