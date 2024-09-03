@@ -38,9 +38,9 @@ export abstract class AbstractService<T> {
     };
   }
 
-  async findBy(condition) {
+  async findBy(condition, populate = '') {
     try {
-      return await this.model.findOne(condition);
+      return await this.model.findOne(condition).populate(populate);
     } catch (error) {
       Logging.error(error);
       throw new InternalServerErrorException(

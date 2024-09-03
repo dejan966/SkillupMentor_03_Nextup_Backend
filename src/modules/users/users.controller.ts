@@ -115,12 +115,17 @@ export class UsersController {
     @Param('id') _id: ObjectId,
     @Body() updateUserDto: UpdateUserDto,
   ) {
-    const hashedPassword: string = await this.utilsService.hash(
-      updateUserDto.password,
-    );
+    const user = await this.usersService.findById(_id);
+    const { password, new_password, confirm_password } = updateUserDto;
+    if (password !== '') {
+      return await this.usersService.updatePassword(user, {
+        password,
+        new_password,
+        confirm_password,
+      });
+    }
     return await this.usersService.update(_id, {
       ...updateUserDto,
-      password: hashedPassword,
     });
   }
 

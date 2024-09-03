@@ -143,7 +143,7 @@ export class UsersService extends AbstractService<User> {
       { _id: user._id },
       {
         $set: {
-          password: await this.utilsService.hash(updateUserDto.password),
+          password: await this.utilsService.hash(updateUserDto.new_password),
           password_token: null,
         },
       },
