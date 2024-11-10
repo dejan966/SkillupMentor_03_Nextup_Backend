@@ -17,7 +17,7 @@ const validMimeTypes: validMimeType[] = [
 export const saveAvatarToStorage: Options = {
   storage: diskStorage({
     destination: './uploads/avatars',
-    filename(req, file, callback) {
+    filename(_req, file, callback) {
       // Create unique suffix
       const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
       // Get file extension
@@ -28,7 +28,7 @@ export const saveAvatarToStorage: Options = {
       callback(null, filename);
     },
   }),
-  fileFilter(req, file, callback) {
+  fileFilter(_req, file, callback) {
     const allowedMimeTypes: validMimeType[] = validMimeTypes;
     allowedMimeTypes.includes(file.mimetype as validMimeType)
       ? callback(null, true)
@@ -39,7 +39,7 @@ export const saveAvatarToStorage: Options = {
 export const saveEventImageToStorage: Options = {
   storage: diskStorage({
     destination: './uploads/events',
-    filename(req, file, callback) {
+    filename(_req, file, callback) {
       // Create unique suffix
       const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
       // Get file extension
@@ -50,7 +50,7 @@ export const saveEventImageToStorage: Options = {
       callback(null, filename);
     },
   }),
-  fileFilter(req, file, callback) {
+  fileFilter(_req, file, callback) {
     const allowedMimeTypes: validMimeType[] = validMimeTypes;
     allowedMimeTypes.includes(file.mimetype as validMimeType)
       ? callback(null, true)
