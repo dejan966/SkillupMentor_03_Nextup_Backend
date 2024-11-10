@@ -102,7 +102,6 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ) {
     const { user } = req;
-    console.log(user);
     const access_token = await this.authService.generateToken(
       user,
       JwtType.ACCESS_TOKEN,
