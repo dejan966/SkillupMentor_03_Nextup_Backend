@@ -24,7 +24,7 @@ export class UpdateUserDto {
   })
   password?: string;
 
-  @ValidateIf((o) => typeof o.password === 'string' && o.password.length > 0)
+  @ValidateIf((o) => typeof o.new_password === 'string' && o.new_password.length > 0)
   @IsOptional()
   @Matches(/^(?=.*\d)[A-Za-z.\s_-]+[\w~@#$%^&+=`|{}:;!.?"()[\]-]{6,}/, {
     message:
