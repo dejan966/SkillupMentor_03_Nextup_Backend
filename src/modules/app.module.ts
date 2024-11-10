@@ -26,7 +26,7 @@ import { ScheduleModule } from '@nestjs/schedule';
         },
       },
     }),
-    MongooseModule.forRoot(process.env.M_DATABASE_URL),
+    MongooseModule.forRoot(process.env.MONGOOSE_DATABASE_URL),
     AuthModule,
     UsersModule,
     EventsModule,

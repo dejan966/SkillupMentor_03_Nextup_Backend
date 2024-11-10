@@ -27,7 +27,7 @@ export class AuthService {
 
   async validateUser(email: string, password: string): Promise<User> {
     Logging.info('Validating user...');
-    const user = await this.usersService.findBy({ email });
+    const user = await this.usersService.findBy({ email }, 'role');
     if (!user) {
       throw new BadRequestException('User with this email doesnt exist');
     }

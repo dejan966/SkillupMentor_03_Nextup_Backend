@@ -9,10 +9,9 @@ import cookieParser from 'cookie-parser';
 import * as admin from 'firebase-admin';
 
 async function bootstrap() {
-  const expressInstance = express();
   const app = await NestFactory.create(
     AppModule,
-    new ExpressAdapter(expressInstance),
+    new ExpressAdapter(),
   );
 
   app.enableCors({
@@ -41,11 +40,11 @@ async function bootstrap() {
 
 admin.initializeApp({
   credential: admin.credential.cert({
-    projectId: process.env.F_PROJECT_ID,
-    clientEmail: process.env.F_CLIENT_EMAIL,
-    privateKey: process.env.F_PRIVATE_KEY.replace(/\\n/g, '\n'),
+    projectId: process.env.FIREBASE_PROJECT_ID,
+    clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+    privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
   }),
-  databaseURL: process.env.F_DATABASE_URL,
+  databaseURL: process.env.FIREBASE_DATABASE_URL,
 });
 
 bootstrap();
