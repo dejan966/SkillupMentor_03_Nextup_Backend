@@ -2,6 +2,9 @@
 /dist
 /node_modules
 
+# images
+/uploads
+
 # env
 .env.development
 .env.production
