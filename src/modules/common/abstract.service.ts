@@ -1,10 +1,6 @@
-import {
-  Injectable,
-  InternalServerErrorException,
-  NotFoundException,
-} from '@nestjs/common';
-import Logging from 'library/Logging';
-import { Model, ObjectId } from 'mongoose';
+import { Injectable, InternalServerErrorException, NotFoundException } from "@nestjs/common";
+import Logging from "library/Logging";
+import { Model, ObjectId } from "mongoose";
 
 @Injectable()
 export abstract class AbstractService<T> {
@@ -15,18 +11,14 @@ export abstract class AbstractService<T> {
     return createdData.save();
   }
 
-  async findAll(populate = ''): Promise<T[]> {
+  async findAll(populate = ""): Promise<T[]> {
     return await this.model.find().populate(populate).exec();
   }
 
-  async findPaginate(pageNumber: number, populate = '') {
+  async findPaginate(pageNumber: number, populate = "") {
     const take = 15;
     const skip = take * (pageNumber - 1);
-    const search = await this.model
-      .find()
-      .populate(populate)
-      .limit(take)
-      .skip(skip);
+    const search = await this.model.find().populate(populate).limit(take).skip(skip);
     const searchDocuments = await this.model.countDocuments();
     return {
       data: search,
@@ -38,7 +30,7 @@ export abstract class AbstractService<T> {
     };
   }
 
-  async findBy(condition, populate = '') {
+  async findBy(condition, populate = "") {
     try {
       return await this.model.findOne(condition).populate(populate);
     } catch (error) {
@@ -49,7 +41,7 @@ export abstract class AbstractService<T> {
     }
   }
 
-  async findById(_id: ObjectId, p = '') {
+  async findById(_id: ObjectId, p = "") {
     return await this.model.findById(_id).populate(p).exec();
   }
 
@@ -64,9 +56,7 @@ export abstract class AbstractService<T> {
       await this.model.updateOne({ _id }, data);
       return data;
     } catch (error) {
-      throw new NotFoundException(
-        'Something went wrong while updating the data.',
-      );
+      throw new NotFoundException("Something went wrong while updating the data.");
     }
   }
 
@@ -75,9 +65,7 @@ export abstract class AbstractService<T> {
       return this.model.findOneAndDelete({ _id });
     } catch (error) {
       Logging.error(error);
-      throw new InternalServerErrorException(
-        'Something went wrong while deleting an item.',
-      );
+      throw new InternalServerErrorException("Something went wrong while deleting an item.");
     }
   }
 }

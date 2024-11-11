@@ -1,7 +1,7 @@
-import { ISendMailOptions, MailerService } from '@nestjs-modules/mailer';
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import * as bcrypt from 'bcrypt';
-import Logging from 'library/Logging';
+import { ISendMailOptions, MailerService } from "@nestjs-modules/mailer";
+import { Injectable, InternalServerErrorException } from "@nestjs/common";
+import * as bcrypt from "bcrypt";
+import Logging from "library/Logging";
 
 @Injectable()
 export class UtilsService {
@@ -12,9 +12,7 @@ export class UtilsService {
       return bcrypt.hash(data, generatedSalt);
     } catch (error) {
       Logging.error(error);
-      throw new InternalServerErrorException(
-        'Something went wrong while hashing the password',
-      );
+      throw new InternalServerErrorException("Something went wrong while hashing the password");
     }
   }
 
@@ -23,9 +21,7 @@ export class UtilsService {
       return bcrypt.compare(data, encryptedData);
     } catch (error) {
       Logging.error(error);
-      throw new InternalServerErrorException(
-        'Something went wrong while comparing the hash.',
-      );
+      throw new InternalServerErrorException("Something went wrong while comparing the hash.");
     }
   }
 
@@ -35,9 +31,7 @@ export class UtilsService {
       return response;
     } catch (error) {
       Logging.error(error);
-      throw new InternalServerErrorException(
-        'Something went wrong while sending the email.',
-      );
+      throw new InternalServerErrorException("Something went wrong while sending the email.");
     }
   }
 }

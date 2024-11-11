@@ -1,18 +1,18 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { User } from 'schemas/user.schema';
-import { Model, ObjectId } from 'mongoose';
-import { AbstractService } from 'modules/common/abstract.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { Event } from 'schemas/event.schema';
-import { ConfigService } from '@nestjs/config';
-import { JwtService } from '@nestjs/jwt';
-import { JwtType } from 'interfaces/auth.interface';
-import { UtilsService } from 'modules/utils/utils.service';
-import { IJwtPayload } from 'interfaces/jwt-payload.interface';
-import * as admin from 'firebase-admin';
-import { DecodedIdToken } from 'firebase-admin/auth';
-import { FirebaseUserDto } from './dto/firebase-user.dto';
+import { BadRequestException, Injectable } from "@nestjs/common";
+import { InjectModel } from "@nestjs/mongoose";
+import { User } from "schemas/user.schema";
+import { Model, ObjectId } from "mongoose";
+import { AbstractService } from "modules/common/abstract.service";
+import { CreateUserDto } from "./dto/create-user.dto";
+import { Event } from "schemas/event.schema";
+import { ConfigService } from "@nestjs/config";
+import { JwtService } from "@nestjs/jwt";
+import { JwtType } from "interfaces/auth.interface";
+import { UtilsService } from "modules/utils/utils.service";
+import { IJwtPayload } from "interfaces/jwt-payload.interface";
+import * as admin from "firebase-admin";
+import { DecodedIdToken } from "firebase-admin/auth";
+import { FirebaseUserDto } from "./dto/firebase-user.dto";
 
 @Injectable()
 export class UsersService extends AbstractService<User> {
@@ -29,7 +29,7 @@ export class UsersService extends AbstractService<User> {
   async createUser(createUserDto: CreateUserDto) {
     const user = await this.findBy({ email: createUserDto.email });
     if (user) {
-      throw new BadRequestException('User with that email already exists.');
+      throw new BadRequestException("User with that email already exists.");
     }
     const createdUser = new this.userModel(createUserDto);
     return createdUser.save();
@@ -38,7 +38,7 @@ export class UsersService extends AbstractService<User> {
   async createFirebaseUser(firebaseUserDto: FirebaseUserDto) {
     const user = await this.findBy({ email: firebaseUserDto.email });
     if (user) {
-      throw new BadRequestException('User with that email already exists.');
+      throw new BadRequestException("User with that email already exists.");
     }
     const createdUser = new this.userModel(firebaseUserDto);
     return createdUser.save();
@@ -57,9 +57,7 @@ export class UsersService extends AbstractService<User> {
   }
 
   async checkToken(user: User, hashed_token: string) {
-    if (
-      await this.utilsService.compareHash(user.password_token, hashed_token)
-    ) {
+    if (await this.utilsService.compareHash(user.password_token, hashed_token)) {
       const decoded = this.jwtService.decode(user.password_token);
       const updatedJwtPayload: IJwtPayload = decoded as IJwtPayload;
       const expires = new Date(updatedJwtPayload.exp * 1000).toLocaleString();
@@ -80,7 +78,7 @@ export class UsersService extends AbstractService<User> {
       const expires = new Date(updatedJwtPayload.exp * 1000).toLocaleString();
       const curr = new Date().toLocaleString();
       if (curr < expires) {
-        throw new BadRequestException('User already requested the token.');
+        throw new BadRequestException("User already requested the token.");
       }
     }
 
@@ -88,8 +86,8 @@ export class UsersService extends AbstractService<User> {
     const token = await this.jwtService.signAsync(
       { sub: user._id, name: user.email, type },
       {
-        secret: this.configService.get('JWT_REFRESH_SECRET'),
-        expiresIn: '900s',
+        secret: this.configService.get("JWT_REFRESH_SECRET"),
+        expiresIn: "900s",
       },
     );
 
@@ -97,12 +95,12 @@ export class UsersService extends AbstractService<User> {
 
     await this.update(user._id, { password_token: token });
 
-    const subject = 'Your password reset token';
+    const subject = "Your password reset token";
     const text = `Hi.<p>Your password reset link is: </p><p>It expires in 15 minutes.</p><p>Your Nextup support team</p>`;
     const html = `Hi.<p>Your password reset link is <a href="http://localhost:3000/me/update-password?token=${hashed}">here</a>.</p><p>It expires in 15 minutes.</p><p>Your Nextup support team</p>`;
 
     return this.utilsService.sendEmail({
-      from: 'Nextup Support <ultimate24208@gmail.com>',
+      from: "Nextup Support <ultimate24208@gmail.com>",
       to: user.email,
       subject: subject,
       text: text,
@@ -119,24 +117,12 @@ export class UsersService extends AbstractService<User> {
     },
   ): Promise<User> {
     if (updateUserDto.new_password && updateUserDto.confirm_password) {
-      if (
-        !(await this.utilsService.compareHash(
-          updateUserDto.password,
-          user.password,
-        ))
-      )
-        throw new BadRequestException('Incorrect current password.');
+      if (!(await this.utilsService.compareHash(updateUserDto.password, user.password)))
+        throw new BadRequestException("Incorrect current password.");
       if (updateUserDto.new_password !== updateUserDto.confirm_password)
-        throw new BadRequestException('Passwords do not match.');
-      if (
-        await this.utilsService.compareHash(
-          updateUserDto.new_password,
-          user.password,
-        )
-      )
-        throw new BadRequestException(
-          'New password cannot be the same as old password.',
-        );
+        throw new BadRequestException("Passwords do not match.");
+      if (await this.utilsService.compareHash(updateUserDto.new_password, user.password))
+        throw new BadRequestException("New password cannot be the same as old password.");
     }
 
     return await this.model.findOneAndUpdate(
@@ -147,7 +133,7 @@ export class UsersService extends AbstractService<User> {
           password_token: null,
         },
       },
-      { returnDocument: 'after' },
+      { returnDocument: "after" },
     );
   }
 
@@ -181,12 +167,12 @@ export class UsersService extends AbstractService<User> {
   async updateUserImageId(_id: ObjectId, avatar: string): Promise<User> {
     const user = await this.findById(_id);
     if (avatar === user.avatar) {
-      throw new BadRequestException('Avatars have to be different.');
+      throw new BadRequestException("Avatars have to be different.");
     }
     const updatedUser = await this.userModel.findOneAndUpdate(
       { _id },
       { $set: { avatar: avatar } },
-      { returnDocument: 'after' },
+      { returnDocument: "after" },
     );
 
     return updatedUser;

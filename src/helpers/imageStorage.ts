@@ -1,25 +1,21 @@
-const FileType = import('file-type');
-import fs from 'fs';
-import Logging from 'library/Logging';
-import { diskStorage, Options } from 'multer';
-import { extname } from 'path';
+const FileType = import("file-type");
+import fs from "fs";
+import Logging from "library/Logging";
+import { diskStorage, Options } from "multer";
+import { extname } from "path";
 
-type validFileExtensionsType = 'png' | 'jpg' | 'jpeg';
-type validMimeType = 'image/png' | 'image/jpg' | 'image/jpeg';
+type validFileExtensionsType = "png" | "jpg" | "jpeg";
+type validMimeType = "image/png" | "image/jpg" | "image/jpeg";
 
-const validFileExtensions: validFileExtensionsType[] = ['png', 'jpg', 'jpeg'];
-const validMimeTypes: validMimeType[] = [
-  'image/png',
-  'image/jpg',
-  'image/jpeg',
-];
+const validFileExtensions: validFileExtensionsType[] = ["png", "jpg", "jpeg"];
+const validMimeTypes: validMimeType[] = ["image/png", "image/jpg", "image/jpeg"];
 
 export const saveAvatarToStorage: Options = {
   storage: diskStorage({
-    destination: './uploads/avatars',
+    destination: "./uploads/avatars",
     filename(_req, file, callback) {
       // Create unique suffix
-      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+      const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
       // Get file extension
       const ext = extname(file.originalname);
       // Write filename
@@ -38,10 +34,10 @@ export const saveAvatarToStorage: Options = {
 
 export const saveEventImageToStorage: Options = {
   storage: diskStorage({
-    destination: './uploads/events',
+    destination: "./uploads/events",
     filename(_req, file, callback) {
       // Create unique suffix
-      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+      const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
       // Get file extension
       const ext = extname(file.originalname);
       // Write filename
@@ -58,23 +54,19 @@ export const saveEventImageToStorage: Options = {
   },
 };
 
-export const isFileExtensionSafe = async (
-  fullFilePath: string,
-): Promise<boolean> => {
-  return (await FileType)
-    .fileTypeFromFile(fullFilePath)
-    .then((fileExtensionAndMimeType) => {
-      if (!fileExtensionAndMimeType?.ext) return false;
+export const isFileExtensionSafe = async (fullFilePath: string): Promise<boolean> => {
+  return (await FileType).fileTypeFromFile(fullFilePath).then((fileExtensionAndMimeType) => {
+    if (!fileExtensionAndMimeType?.ext) return false;
 
-      const isFileTypeLegit = validFileExtensions.includes(
-        fileExtensionAndMimeType.ext as validFileExtensionsType,
-      );
-      const isMimeTypeLegit = validMimeTypes.includes(
-        fileExtensionAndMimeType.mime as validMimeType,
-      );
-      const isFileLegit = isFileTypeLegit && isMimeTypeLegit;
-      return isFileLegit;
-    });
+    const isFileTypeLegit = validFileExtensions.includes(
+      fileExtensionAndMimeType.ext as validFileExtensionsType,
+    );
+    const isMimeTypeLegit = validMimeTypes.includes(
+      fileExtensionAndMimeType.mime as validMimeType,
+    );
+    const isFileLegit = isFileTypeLegit && isMimeTypeLegit;
+    return isFileLegit;
+  });
 };
 export const removeFile = (fullFilePath: string): void => {
   try {

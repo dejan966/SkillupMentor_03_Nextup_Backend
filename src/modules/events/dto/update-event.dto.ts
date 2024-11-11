@@ -1,5 +1,5 @@
-import { IsOptional } from 'class-validator';
-import { User } from 'schemas/user.schema';
+import { IsOptional } from "class-validator";
+import { User } from "schemas/user.schema";
 
 export class UpdateEventDto {
   @IsOptional()

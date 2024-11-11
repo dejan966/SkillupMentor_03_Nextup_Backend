@@ -4,17 +4,17 @@ import {
   Injectable,
   InternalServerErrorException,
   UnauthorizedException,
-} from '@nestjs/common';
-import { User } from 'schemas/user.schema';
-import { Request, Response } from 'express';
-import { UsersService } from '../users/users.service';
-import { RegisterUserDto } from './dto/register-user.dto';
-import { UtilsService } from 'modules/utils/utils.service';
-import { CookieType, JwtType, TokenPayload } from 'interfaces/auth.interface';
-import { ConfigService } from '@nestjs/config';
-import { JwtService } from '@nestjs/jwt';
-import { ObjectId } from 'mongoose';
-import Logging from 'library/Logging';
+} from "@nestjs/common";
+import { User } from "schemas/user.schema";
+import { Request, Response } from "express";
+import { UsersService } from "../users/users.service";
+import { RegisterUserDto } from "./dto/register-user.dto";
+import { UtilsService } from "modules/utils/utils.service";
+import { CookieType, JwtType, TokenPayload } from "interfaces/auth.interface";
+import { ConfigService } from "@nestjs/config";
+import { JwtService } from "@nestjs/jwt";
+import { ObjectId } from "mongoose";
+import Logging from "library/Logging";
 
 @Injectable()
 export class AuthService {
@@ -26,22 +26,20 @@ export class AuthService {
   ) {}
 
   async validateUser(email: string, password: string): Promise<User> {
-    Logging.info('Validating user...');
-    const user = await this.usersService.findBy({ email }, 'role');
+    Logging.info("Validating user...");
+    const user = await this.usersService.findBy({ email }, "role");
     if (!user) {
-      throw new BadRequestException('User with this email doesnt exist');
+      throw new BadRequestException("User with this email doesnt exist");
     }
     if (!(await this.utilsService.compareHash(password, user.password))) {
-      throw new BadRequestException('Invalid password');
+      throw new BadRequestException("Invalid password");
     }
-    Logging.info('User is valid');
+    Logging.info("User is valid");
     return user;
   }
 
   async register(registerUserDto: RegisterUserDto): Promise<User> {
-    const hashedPassword: string = await this.utilsService.hash(
-      registerUserDto.password,
-    );
+    const hashedPassword: string = await this.utilsService.hash(registerUserDto.password);
     const user = await this.usersService.createUser({
       ...registerUserDto,
       password: hashedPassword,
@@ -54,7 +52,7 @@ export class AuthService {
       await this.usersService.update(userId, { refresh_token: rt });
     } catch (error) {
       throw new InternalServerErrorException(
-        'Something went wrong while updating user refresh token',
+        "Something went wrong while updating user refresh token",
       );
     }
   }
@@ -69,22 +67,22 @@ export class AuthService {
           break;
         case JwtType.REFRESH_TOKEN:
           token = await this.jwtService.signAsync(payload, {
-            secret: this.configService.get('JWT_REFRESH_SECRET'),
+            secret: this.configService.get("JWT_REFRESH_SECRET"),
           });
           break;
         case JwtType.PASSWORD_TOKEN:
           token = await this.jwtService.signAsync(payload, {
-            secret: this.configService.get('JWT_REFRESH_SECRET'),
-            expiresIn: '15m',
+            secret: this.configService.get("JWT_REFRESH_SECRET"),
+            expiresIn: "15m",
           });
           break;
         default:
-          throw new BadRequestException('Access denied');
+          throw new BadRequestException("Access denied");
       }
     } catch (error) {
       Logging.error(error);
       throw new InternalServerErrorException(
-        'Something went wrong while generating a new token.',
+        "Something went wrong while generating a new token.",
       );
     }
     return token;
@@ -96,16 +94,16 @@ export class AuthService {
       switch (type) {
         case CookieType.ACCESS_TOKEN:
           cookie = `access_token=${token}; HttpOnly; Path =/; Max-Age=${this.configService.get(
-            'JWT_SECRET_EXPIRES',
+            "JWT_SECRET_EXPIRES",
           )}; SameSite:strict`;
           break;
         case CookieType.REFRESH_TOKEN:
           cookie = `refresh_token=${token}; HttpOnly; Path =/; Max-Age=${this.configService.get(
-            'JWT_REFRESH_SECRET_EXPIRES',
+            "JWT_REFRESH_SECRET_EXPIRES",
           )}; SameSite:strict`;
           break;
         default:
-          throw new BadRequestException('Access denied');
+          throw new BadRequestException("Access denied");
       }
       return cookie;
     } catch (error) {
@@ -128,23 +126,21 @@ export class AuthService {
     }
     try {
       await this.jwtService.verifyAsync(user.refresh_token, {
-        secret: this.configService.get('JWT_REFRESH_SECRET'),
+        secret: this.configService.get("JWT_REFRESH_SECRET"),
       });
     } catch (error) {
       Logging.error(error);
-      throw new UnauthorizedException(
-        'Something went wrong while refreshing tokens',
-      );
+      throw new UnauthorizedException("Something went wrong while refreshing tokens");
     }
     const token = await this.generateToken(user, JwtType.ACCESS_TOKEN);
     const cookie = await this.generateCookie(token, CookieType.ACCESS_TOKEN);
 
     try {
-      req.res.setHeader('Set-Cookie', cookie);
+      req.res.setHeader("Set-Cookie", cookie);
     } catch (error) {
       Logging.error(error);
       throw new InternalServerErrorException(
-        'Something went wrong while setting cookies into the response header',
+        "Something went wrong while setting cookies into the response header",
       );
     }
     return user;
@@ -152,11 +148,11 @@ export class AuthService {
 
   async firebaseSignout(res: Response): Promise<void> {
     try {
-      res.clearCookie('access_token').sendStatus(200);
+      res.clearCookie("access_token").sendStatus(200);
     } catch (error) {
       Logging.error(error);
       throw new InternalServerErrorException(
-        'Something went wrong while setting cookies into response header',
+        "Something went wrong while setting cookies into response header",
       );
     }
   }
@@ -165,24 +161,24 @@ export class AuthService {
     const user = await this.usersService.findById(userId);
     await this.usersService.update(user._id, { refresh_token: null });
     try {
-      res.setHeader('Set-Cookie', this.getCookiesForSignOut()).sendStatus(200);
+      res.setHeader("Set-Cookie", this.getCookiesForSignOut()).sendStatus(200);
     } catch (error) {
       Logging.error(error);
       throw new InternalServerErrorException(
-        'Something went wrong while setting cookies into response header',
+        "Something went wrong while setting cookies into response header",
       );
     }
   }
 
   getCookiesForSignOut(): string[] {
     return [
-      'access_token=; HttpOnly; Path =/; Max-Age=0;',
-      'refresh_token=; HttpOnly; Path =/; Max-Age=0',
+      "access_token=; HttpOnly; Path =/; Max-Age=0;",
+      "refresh_token=; HttpOnly; Path =/; Max-Age=0",
     ];
   }
 
   async getUserIfTokenMatches(refreshToken: string, userId: ObjectId) {
-    const user = await this.usersService.findById(userId, 'created_events');
+    const user = await this.usersService.findById(userId, "created_events");
     const isRefreshTokenMatching = await this.utilsService.compareHash(
       refreshToken,
       user.refresh_token,

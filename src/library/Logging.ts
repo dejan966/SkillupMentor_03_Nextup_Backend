@@ -1,8 +1,8 @@
-import moment from 'moment';
+import moment from "moment";
 
-const chalk = import('chalk').then((m) => m.default);
+const chalk = import("chalk").then((m) => m.default);
 var momentDate = moment();
-momentDate.locale('sl');
+momentDate.locale("sl");
 const date = momentDate.format("L, LTS");
 
 export default class Logging {
@@ -10,7 +10,7 @@ export default class Logging {
     console.log(
       (await chalk).blue(
         `[${date}] [INFO]`,
-        typeof args === 'string' ? (await chalk).blueBright(args) : args,
+        typeof args === "string" ? (await chalk).blueBright(args) : args,
       ),
     );
 
@@ -18,7 +18,7 @@ export default class Logging {
     console.log(
       (await chalk).yellow(
         `[${date}] [INFO]`,
-        typeof args === 'string' ? (await chalk).yellowBright(args) : args,
+        typeof args === "string" ? (await chalk).yellowBright(args) : args,
       ),
     );
 
@@ -26,7 +26,7 @@ export default class Logging {
     console.log(
       (await chalk).red(
         `[${date}] [INFO]`,
-        typeof args === 'string' ? (await chalk).redBright(args) : args,
+        typeof args === "string" ? (await chalk).redBright(args) : args,
       ),
     );
 }
