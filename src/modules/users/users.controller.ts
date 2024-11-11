@@ -129,7 +129,7 @@ export class UsersController {
 
   @Post("me/reset-password")
   @UseGuards(JwtAuthGuard)
-  async checkEmail(@Body() updateUserDto: UpdateUserDto) {
+  async resetPassword(@Body() updateUserDto: UpdateUserDto) {
     return await this.usersService.checkEmail(updateUserDto.email);
   }
 
