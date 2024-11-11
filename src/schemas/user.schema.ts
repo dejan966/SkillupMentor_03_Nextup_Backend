@@ -14,10 +14,10 @@ export class User {
   @Prop({ default: 'default-profile.png' })
   avatar: string;
 
-  @Prop({ default: '' })
+  @Prop({ default: null })
   first_name: string;
 
-  @Prop({ default: '' })
+  @Prop({ default: null })
   last_name: string;
 
   @Prop({ nullable: true })
