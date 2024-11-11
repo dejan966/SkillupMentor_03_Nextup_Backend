@@ -15,6 +15,7 @@ import { SchedulerRegistry } from '@nestjs/schedule';
 import { UtilsService } from 'modules/utils/utils.service';
 import { PaginatedResult } from 'interfaces/paginated-result';
 import Logging from 'library/Logging';
+import moment from 'moment';
 
 @Injectable()
 export class EventsService extends AbstractService<Event> {
@@ -51,7 +52,7 @@ export class EventsService extends AbstractService<Event> {
     if (searchValue === '') {
       const options = {
         date: {
-          $eq: new Date(dateValue).toISOString().substring(0, 10),
+          $eq: dateValue,
         },
       };
       return this.search(options, pageNumber);
@@ -61,7 +62,7 @@ export class EventsService extends AbstractService<Event> {
     const options = {
       location: new RegExp(searchString, 'i'),
       date: {
-        $eq: new Date(dateValue).toISOString().substring(0, 10),
+        $eq: dateValue,
       },
     };
     return this.search(options, pageNumber);
@@ -107,34 +108,43 @@ export class EventsService extends AbstractService<Event> {
   }
 
   async currUserUpcomingEvents(user: User) {
+    var momentDate = moment();
+    const date = momentDate.format("YYYY-M-D");
+    console.log(date);
     const upcomingE = await this.eventModel.find({
       booked_users: { $in: [user._id] },
-      date: { $gt: new Date().toISOString().substring(0, 10) },
+      date: { $gt: date },
     });
 
     return upcomingE;
   }
 
   async currUserRecentEvents(user: User) {
+    var momentDate = moment();
+    const date = momentDate.format("YYYY-M-D");
     const recentE = await this.eventModel.find({
       booked_users: { $in: [user._id] },
-      date: { $lt: new Date().toISOString().substring(0, 10) },
+      date: { $lt: date },
     });
 
     return recentE;
   }
 
   async upcomingEvents() {
+    var momentDate = moment();
+    const date = momentDate.format("YYYY-M-D");;
     const upcomingE = await this.eventModel.find({
-      date: { $gt: new Date().toISOString().substring(0, 10) },
+      date: { $gt: date },
     });
 
     return upcomingE;
   }
 
   async recentEvents() {
+    var momentDate = moment();
+    const date = momentDate.format("YYYY-M-D");
     const recentE = await this.eventModel.find({
-      date: { $lt: new Date().toISOString().substring(0, 10) },
+      date: { $lt: date },
     });
 
     return recentE;
