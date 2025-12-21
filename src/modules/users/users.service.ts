@@ -1,10 +1,10 @@
 import { BadRequestException, Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import { User } from "schemas/user.schema";
-import { Model, ObjectId } from "mongoose";
+import { User, UserDocument } from "schemas/user.schema";
+import { Model, Types } from "mongoose";
 import { AbstractService } from "modules/common/abstract.service";
 import { CreateUserDto } from "./dto/create-user.dto";
-import { Event } from "schemas/event.schema";
+import { EventDocument } from "schemas/event.schema";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 import { JwtType } from "interfaces/auth.interface";
@@ -56,7 +56,7 @@ export class UsersService extends AbstractService<User> {
     return user;
   }
 
-  async checkToken(user: User, hashed_token: string) {
+  async checkToken(user: UserDocument, hashed_token: string) {
     if (await this.utilsService.compareHash(user.password_token, hashed_token)) {
       const decoded = this.jwtService.decode(user.password_token);
       const updatedJwtPayload: IJwtPayload = decoded as IJwtPayload;
@@ -69,7 +69,7 @@ export class UsersService extends AbstractService<User> {
     return false;
   }
 
-  async makeToken(user: User) {
+  async makeToken(user: UserDocument) {
     const { password_token } = user;
 
     if (password_token) {
@@ -109,13 +109,13 @@ export class UsersService extends AbstractService<User> {
   }
 
   async updatePassword(
-    user: User,
+    user: UserDocument,
     updateUserDto: {
       password: string;
       new_password: string;
       confirm_password: string;
     },
-  ): Promise<User> {
+  ): Promise<UserDocument> {
     if (updateUserDto.new_password && updateUserDto.confirm_password) {
       if (!(await this.utilsService.compareHash(updateUserDto.password, user.password)))
         throw new BadRequestException("Incorrect current password.");
@@ -146,7 +146,7 @@ export class UsersService extends AbstractService<User> {
     return await this.userModel.find();
   }
 
-  async createdEvent(user: User, event: Event) {
+  async createdEvent(user: UserDocument, event: EventDocument) {
     const creator = await this.findById(user._id);
     return await creator.updateOne({
       $push: {
@@ -155,7 +155,7 @@ export class UsersService extends AbstractService<User> {
     });
   }
 
-  async bookEvent(user: User, event: Event) {
+  async bookEvent(user: UserDocument, event: EventDocument) {
     const creator = await this.findById(user._id);
     return await creator.updateOne({
       $push: {
@@ -164,7 +164,7 @@ export class UsersService extends AbstractService<User> {
     });
   }
 
-  async updateUserImageId(_id: ObjectId, avatar: string): Promise<User> {
+  async updateUserImageId(_id: Types.ObjectId, avatar: string): Promise<UserDocument> {
     const user = await this.findById(_id);
     if (avatar === user.avatar) {
       throw new BadRequestException("Avatars have to be different.");

@@ -8,10 +8,11 @@ import {
   Req,
   UseGuards,
   InternalServerErrorException,
+  UseInterceptors,
 } from "@nestjs/common";
 import { Public } from "decorators/public.decorator";
 import { Response } from "express";
-import { User } from "schemas/user.schema";
+import { User, UserDocument } from "schemas/user.schema";
 import { CookieType, JwtType, RequestWithUser } from "interfaces/auth.interface";
 import { AuthService } from "./auth.service";
 import { RegisterUserDto } from "./dto/register-user.dto";
@@ -20,6 +21,7 @@ import { GetCurrentUser } from "decorators/get-current-user.decorator";
 import Logging from "library/Logging";
 import { UsersService } from "modules/users/users.service";
 import { AuthGuard } from "@nestjs/passport";
+import MongooseClassSerializerInterceptor from "interceptors/mongoose.interceptor";
 
 @Controller("auth")
 export class AuthController {
@@ -89,6 +91,7 @@ export class AuthController {
   @Public()
   @Post("login")
   @UseGuards(LocalAuthGuard)
+  @UseInterceptors(MongooseClassSerializerInterceptor(User))
   @HttpCode(HttpStatus.OK)
   async login(@Req() req: RequestWithUser, @Res({ passthrough: true }) res: Response) {
     const { user } = req;
@@ -106,7 +109,8 @@ export class AuthController {
 
     try {
       await this.authService.updateRtHash(user._id, refresh_token);
-      res.setHeader("Set-Cookie", [access_token_cookie, refresh_token_cookie]).json(user);
+      res.setHeader("Set-Cookie", [access_token_cookie, refresh_token_cookie]); //.json(req.user);
+      return req.user;
     } catch (error) {
       throw new InternalServerErrorException(
         "Something went wrong while setting cookies into response header",
@@ -117,7 +121,10 @@ export class AuthController {
   @Post("signout")
   @UseGuards(AuthGuard(["jwt", "firebase"]))
   @HttpCode(HttpStatus.OK)
-  async signout(@GetCurrentUser() userData: User, @Res({ passthrough: true }) res: Response) {
+  async signout(
+    @GetCurrentUser() userData: UserDocument,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     return this.authService.signout(userData._id, res);
   }
 }

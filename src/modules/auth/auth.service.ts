@@ -5,7 +5,7 @@ import {
   InternalServerErrorException,
   UnauthorizedException,
 } from "@nestjs/common";
-import { User } from "schemas/user.schema";
+import { UserDocument } from "schemas/user.schema";
 import { Request, Response } from "express";
 import { UsersService } from "../users/users.service";
 import { RegisterUserDto } from "./dto/register-user.dto";
@@ -13,7 +13,7 @@ import { UtilsService } from "modules/utils/utils.service";
 import { CookieType, JwtType, TokenPayload } from "interfaces/auth.interface";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
-import { ObjectId } from "mongoose";
+import { Types } from "mongoose";
 import Logging from "library/Logging";
 
 @Injectable()
@@ -25,7 +25,7 @@ export class AuthService {
     private configService: ConfigService,
   ) {}
 
-  async validateUser(email: string, password: string): Promise<User> {
+  async validateUser(email: string, password: string): Promise<UserDocument> {
     Logging.info("Validating user...");
     const user = await this.usersService.findBy({ email }, "role");
     if (!user) {
@@ -38,7 +38,7 @@ export class AuthService {
     return user;
   }
 
-  async register(registerUserDto: RegisterUserDto): Promise<User> {
+  async register(registerUserDto: RegisterUserDto): Promise<UserDocument> {
     const hashedPassword: string = await this.utilsService.hash(registerUserDto.password);
     const user = await this.usersService.createUser({
       ...registerUserDto,
@@ -47,7 +47,7 @@ export class AuthService {
     return user;
   }
 
-  async updateRtHash(userId: ObjectId, rt: string): Promise<void> {
+  async updateRtHash(userId: Types.ObjectId, rt: string): Promise<void> {
     try {
       await this.usersService.update(userId, { refresh_token: rt });
     } catch (error) {
@@ -57,7 +57,7 @@ export class AuthService {
     }
   }
 
-  async generateToken(user: User, type: JwtType) {
+  async generateToken(user: UserDocument, type: JwtType) {
     const payload: TokenPayload = { sub: user._id, name: user.email, type };
     let token: string;
     try {
@@ -117,7 +117,7 @@ export class AuthService {
     }
   }
 
-  async refreshTokens(req: Request): Promise<User> {
+  async refreshTokens(req: Request): Promise<UserDocument> {
     const user = await this.usersService.findBy({
       refresh_token: req.cookies.refresh_token,
     });
@@ -157,7 +157,7 @@ export class AuthService {
     }
   }
 
-  async signout(userId: ObjectId, res: Response): Promise<void> {
+  async signout(userId: Types.ObjectId, res: Response): Promise<void> {
     const user = await this.usersService.findById(userId);
     await this.usersService.update(user._id, { refresh_token: null });
     try {
@@ -177,7 +177,7 @@ export class AuthService {
     ];
   }
 
-  async getUserIfTokenMatches(refreshToken: string, userId: ObjectId) {
+  async getUserIfTokenMatches(refreshToken: string, userId: Types.ObjectId) {
     const user = await this.usersService.findById(userId, "created_events");
     const isRefreshTokenMatching = await this.utilsService.compareHash(
       refreshToken,

@@ -1,10 +1,10 @@
 import { BadRequestException, Injectable, InternalServerErrorException } from "@nestjs/common";
 import { CreateEventDto } from "./dto/create-event.dto";
 import { AbstractService } from "modules/common/abstract.service";
-import { Event } from "schemas/event.schema";
+import { Event, EventDocument } from "schemas/event.schema";
 import { InjectModel } from "@nestjs/mongoose";
-import { Model, ObjectId } from "mongoose";
-import { User } from "schemas/user.schema";
+import { Model, Types } from "mongoose";
+import { UserDocument } from "schemas/user.schema";
 import { UsersService } from "modules/users/users.service";
 import { CronJob } from "cron";
 import { SchedulerRegistry } from "@nestjs/schedule";
@@ -25,7 +25,7 @@ export class EventsService extends AbstractService<Event> {
     super(eventModel);
   }
 
-  async addEvent(createEventDto: CreateEventDto, creator: User) {
+  async addEvent(createEventDto: CreateEventDto, creator: UserDocument) {
     try {
       const createdEvent = new this.eventModel({ ...createEventDto, creator });
       const created = createdEvent.save();
@@ -88,7 +88,7 @@ export class EventsService extends AbstractService<Event> {
     }
   }
 
-  async updateEventImageId(_id: ObjectId, image: string): Promise<Event> {
+  async updateEventImageId(_id: Types.ObjectId, image: string): Promise<EventDocument> {
     const event = await this.findById(_id);
     if (image === event.image) {
       throw new BadRequestException("Images have to be different.");
@@ -103,10 +103,10 @@ export class EventsService extends AbstractService<Event> {
     return updatedEvent;
   }
 
-  async currUserUpcomingEvents(user: User) {
+  async currUserUpcomingEvents(user: UserDocument) {
     var momentDate = moment();
     const date = momentDate.format("YYYY-M-D");
-    console.log(date);
+
     const upcomingE = await this.eventModel.find({
       booked_users: { $in: [user._id] },
       date: { $gt: date },
@@ -115,7 +115,7 @@ export class EventsService extends AbstractService<Event> {
     return upcomingE;
   }
 
-  async currUserRecentEvents(user: User) {
+  async currUserRecentEvents(user: UserDocument) {
     var momentDate = moment();
     const date = momentDate.format("YYYY-M-D");
     const recentE = await this.eventModel.find({
@@ -146,7 +146,7 @@ export class EventsService extends AbstractService<Event> {
     return recentE;
   }
 
-  async bookUser(_id: ObjectId, user: User) {
+  async bookUser(_id: Types.ObjectId, user: UserDocument) {
     const event = await this.findById(_id);
     if (event.booked_users.length < event.max_users) {
       await event.updateOne({
@@ -162,7 +162,7 @@ export class EventsService extends AbstractService<Event> {
     }
   }
 
-  async scheduleEmail(event, user: User) {
+  async scheduleEmail(event, user: UserDocument) {
     const subject = "Reminder";
     const text = `Hi<p>Please, dont forget about the event that will be at.</p>`;
     const html = `Hi<p>Please, dont forget about the event that will be at ${

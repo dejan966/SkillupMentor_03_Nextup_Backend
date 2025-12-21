@@ -1,15 +1,15 @@
 import { Request } from "@nestjs/common";
-import { ObjectId } from "mongoose";
-import { User } from "schemas/user.schema";
+import { Types } from "mongoose";
+import { UserDocument } from "schemas/user.schema";
 
 export interface TokenPayload {
   name: string;
-  sub: ObjectId;
+  sub: Types.ObjectId;
   type: JwtType;
 }
 
 export interface RequestWithUser extends Request {
-  user: User;
+  user: UserDocument;
 }
 
 export enum JwtType {

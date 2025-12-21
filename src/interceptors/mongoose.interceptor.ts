@@ -19,6 +19,15 @@ function MongooseClassSerializerInterceptor(
         return response.map(this.changePlainObjectToClass);
       }
 
+      // for pagination
+      if (Array.isArray(response["data"])) {
+        return {
+          ...response,
+          ["data"]: response["data"].map(this.changePlainObjectToClass),
+          ["meta"]: response["meta"],
+        };
+      }
+
       return this.changePlainObjectToClass(response);
     }
 

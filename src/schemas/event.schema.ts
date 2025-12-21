@@ -1,15 +1,12 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { HydratedDocument, ObjectId, Schema as SchemaM } from "mongoose";
+import { HydratedDocument, Schema as SchemaM } from "mongoose";
 import { User } from "./user.schema";
-import { Transform, Type } from "class-transformer";
+import { Type } from "class-transformer";
 
 export type EventDocument = HydratedDocument<Event>;
 
 @Schema({ timestamps: { createdAt: "created_at", updatedAt: "updated_at" } })
 export class Event {
-  @Transform(({ value }) => value.toString())
-  _id: ObjectId;
-
   @Prop({ required: true })
   name: string;
 
@@ -41,3 +38,10 @@ export class Event {
 }
 
 export const EventSchema = SchemaFactory.createForClass(Event);
+
+EventSchema.set("toJSON", {
+  transform: (_, ret) => {
+    ret._id = ret._id.toString();
+    return ret;
+  },
+});

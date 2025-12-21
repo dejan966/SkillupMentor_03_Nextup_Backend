@@ -19,21 +19,26 @@ import { CreateEventDto } from "./dto/create-event.dto";
 import { UpdateEventDto } from "./dto/update-event.dto";
 import { EventGuard } from "modules/auth/guards/event.guard";
 import { GetCurrentUser } from "decorators/get-current-user.decorator";
-import { User } from "schemas/user.schema";
-import { Event } from "schemas/event.schema";
+import { UserDocument } from "schemas/user.schema";
+import { EventDocument, Event } from "schemas/event.schema";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { saveEventImageToStorage, isFileExtensionSafe, removeFile } from "helpers/imageStorage";
 import { join } from "path";
-import { ObjectId } from "mongoose";
+import { Types } from "mongoose";
 import { AuthGuard } from "@nestjs/passport";
+import MongooseClassSerializerInterceptor from "interceptors/mongoose.interceptor";
 
 @Controller("events")
+@UseInterceptors(MongooseClassSerializerInterceptor(Event))
 export class EventsController {
   constructor(private readonly eventsService: EventsService) {}
 
   @Post()
   @UseGuards(AuthGuard(["jwt", "firebase"]))
-  async create(@Body() createEventDto: CreateEventDto, @GetCurrentUser() creator: User) {
+  async create(
+    @Body() createEventDto: CreateEventDto,
+    @GetCurrentUser() creator: UserDocument,
+  ) {
     return this.eventsService.addEvent(createEventDto, creator);
   }
 
@@ -48,7 +53,7 @@ export class EventsController {
 
   @Patch("bookUser/:id")
   @UseGuards(AuthGuard(["jwt", "firebase"]), EventGuard)
-  async addUser(@Param("id") _id: ObjectId, @GetCurrentUser() user: User) {
+  async addUser(@Param("id") _id: Types.ObjectId, @GetCurrentUser() user: UserDocument) {
     return await this.eventsService.bookUser(_id, user);
   }
 
@@ -59,14 +64,14 @@ export class EventsController {
 
   @Get("user/upcomingEvents")
   @UseGuards(AuthGuard(["jwt", "firebase"]))
-  async currUserUpcomingEvents(@GetCurrentUser() user: User) {
+  async currUserUpcomingEvents(@GetCurrentUser() user: UserDocument) {
     const upcomingEvents = await this.eventsService.currUserUpcomingEvents(user);
     return upcomingEvents;
   }
 
   @Get("user/recentEvents")
   @UseGuards(AuthGuard(["jwt", "firebase"]))
-  async currUserRecentEvents(@GetCurrentUser() user: User) {
+  async currUserRecentEvents(@GetCurrentUser() user: UserDocument) {
     const upcomingEvents = await this.eventsService.currUserRecentEvents(user);
     return upcomingEvents;
   }
@@ -89,8 +94,8 @@ export class EventsController {
   @HttpCode(HttpStatus.CREATED)
   async upload(
     @UploadedFile() file: Express.Multer.File,
-    @Param("id") _id: ObjectId,
-  ): Promise<Event> {
+    @Param("id") _id: Types.ObjectId,
+  ): Promise<EventDocument> {
     const filename = file?.filename;
 
     if (!filename) throw new BadRequestException("File must be a png, jpg/jpeg");
@@ -105,19 +110,19 @@ export class EventsController {
   }
 
   @Get(":id")
-  async findOne(@Param("id") _id: ObjectId) {
+  async findOne(@Param("id") _id: Types.ObjectId) {
     return await this.eventsService.findById(_id, "creator");
   }
 
   @Patch(":id")
   @UseGuards(AuthGuard(["jwt", "firebase"]), EventGuard)
-  async update(@Param("id") _id: ObjectId, @Body() updateEventDto: UpdateEventDto) {
+  async update(@Param("id") _id: Types.ObjectId, @Body() updateEventDto: UpdateEventDto) {
     return await this.eventsService.update(_id, updateEventDto);
   }
 
   @Delete(":id")
   @UseGuards(AuthGuard(["jwt", "firebase"]), EventGuard)
-  async remove(@Param("id") _id: ObjectId) {
+  async remove(@Param("id") _id: Types.ObjectId) {
     return await this.eventsService.remove(_id);
   }
 }

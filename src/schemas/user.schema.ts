@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Exclude, Transform, Type } from "class-transformer";
-import { HydratedDocument, ObjectId, Schema as SchemaM } from "mongoose";
+import { Exclude, Type } from "class-transformer";
+import { HydratedDocument, Schema as SchemaM } from "mongoose";
 import { Event } from "./event.schema";
 import { Role } from "./role.schema";
 
@@ -8,9 +8,6 @@ export type UserDocument = HydratedDocument<User>;
 
 @Schema({ timestamps: { createdAt: "created_at", updatedAt: "updated_at" } })
 export class User {
-  @Transform(({ value }) => value.toString())
-  _id: ObjectId;
-
   @Prop({ default: "default-profile.png" })
   avatar: string;
 
@@ -59,3 +56,10 @@ export class User {
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
+
+UserSchema.set("toJSON", {
+  transform: (_, ret) => {
+    ret._id = ret._id.toString();
+    return ret;
+  },
+});

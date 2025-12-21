@@ -19,18 +19,20 @@ import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { GetCurrentUser } from "decorators/get-current-user.decorator";
 import { JwtAuthGuard } from "modules/auth/guards/jwt.guard";
-import { User } from "schemas/user.schema";
+import { User, UserDocument } from "schemas/user.schema";
 import { UserGuard } from "modules/auth/guards/user.guard";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { join } from "path";
 import { Express } from "express";
 import { saveAvatarToStorage, isFileExtensionSafe, removeFile } from "helpers/imageStorage";
-import { ObjectId } from "mongoose";
+import { Types } from "mongoose";
 import { AuthGuard } from "@nestjs/passport";
 import { RoleGuard } from "modules/auth/guards/role.guard";
 import { UtilsService } from "modules/utils/utils.service";
+import MongooseClassSerializerInterceptor from "interceptors/mongoose.interceptor";
 
 @Controller("users")
+@UseInterceptors(MongooseClassSerializerInterceptor(User))
 export class UsersController {
   constructor(
     private readonly usersService: UsersService,
@@ -49,7 +51,7 @@ export class UsersController {
 
   @Get("me")
   @UseGuards(AuthGuard(["jwt", "firebase"]))
-  async getCurrentUser(@GetCurrentUser() user: User) {
+  async getCurrentUser(@GetCurrentUser() user: UserDocument) {
     return user;
   }
 
@@ -68,8 +70,8 @@ export class UsersController {
   @HttpCode(HttpStatus.CREATED)
   async upload(
     @UploadedFile() file: Express.Multer.File,
-    @Param("id") _id: ObjectId,
-  ): Promise<User> {
+    @Param("id") _id: Types.ObjectId,
+  ): Promise<UserDocument> {
     const filename = file?.filename;
     if (!filename) throw new BadRequestException("File must be a png, jpg/jpeg");
 
@@ -84,24 +86,24 @@ export class UsersController {
 
   @Get(":id/:token(*)")
   @UseGuards(JwtAuthGuard, UserGuard)
-  async checkToken(@Param("id") user_id: ObjectId, @Param("token") hashed_token: string) {
+  async checkToken(@Param("id") user_id: Types.ObjectId, @Param("token") hashed_token: string) {
     const user = await this.usersService.findById(user_id);
     return this.usersService.checkToken(user, hashed_token);
   }
 
   @Get(":id")
   @UseGuards(AuthGuard(["jwt", "firebase"]), UserGuard)
-  async findById(@Param("id") _id: ObjectId) {
+  async findById(@Param("id") _id: Types.ObjectId) {
     const user = await this.usersService.findById(_id, "role created_events events_booked");
     return user;
   }
 
   @Patch(":id")
   @UseGuards(AuthGuard(["jwt", "firebase"]), UserGuard)
-  async update(@Param("id") _id: ObjectId, @Body() updateUserDto: UpdateUserDto) {
+  async update(@Param("id") _id: Types.ObjectId, @Body() updateUserDto: UpdateUserDto) {
     const user = await this.usersService.findById(_id);
     const { password, new_password, confirm_password } = updateUserDto;
-    if (password !== "") {
+    if (password && password !== "") {
       return await this.usersService.updatePassword(user, {
         password,
         new_password,
@@ -116,7 +118,7 @@ export class UsersController {
   @Patch("/me/update-password")
   @UseGuards(JwtAuthGuard)
   async updatePassword(
-    @GetCurrentUser() user: User,
+    @GetCurrentUser() user: UserDocument,
     @Body()
     updateUserDto: {
       password: string;
@@ -135,7 +137,7 @@ export class UsersController {
 
   @Delete(":id")
   @UseGuards(JwtAuthGuard, UserGuard)
-  async remove(@Param("id") _id: ObjectId) {
+  async remove(@Param("id") _id: Types.ObjectId) {
     return await this.usersService.remove(_id);
   }
 }
