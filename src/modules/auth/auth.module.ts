@@ -10,12 +10,14 @@ import { JwtRefreshStrategy } from "./strategies/jwt-refresh.strategy";
 import { PassportModule } from "@nestjs/passport";
 import { UtilsModule } from "modules/utils/utils.module";
 import { FirebaseStrategy } from "./strategies/firebase.strategy";
+import { RolesModule } from "modules/roles/roles.module";
 
 @Module({
   imports: [
     UsersModule,
     PassportModule,
     UtilsModule,
+    RolesModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],

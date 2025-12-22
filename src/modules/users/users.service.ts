@@ -13,6 +13,7 @@ import { IJwtPayload } from "interfaces/jwt-payload.interface";
 import * as admin from "firebase-admin";
 import { DecodedIdToken } from "firebase-admin/auth";
 import { FirebaseUserDto } from "./dto/firebase-user.dto";
+import { RolesService } from "modules/roles/roles.service";
 
 @Injectable()
 export class UsersService extends AbstractService<UserDocument> {
@@ -21,6 +22,7 @@ export class UsersService extends AbstractService<UserDocument> {
     private userModel: Model<UserDocument>,
     private configService: ConfigService,
     private jwtService: JwtService,
+    private rolesService: RolesService,
     private readonly utilsService: UtilsService,
   ) {
     super(userModel);
@@ -31,7 +33,10 @@ export class UsersService extends AbstractService<UserDocument> {
     if (user) {
       throw new BadRequestException("User with that email already exists.");
     }
-    const createdUser = new this.userModel(createUserDto);
+    const createdUser = new this.userModel({
+      ...createUserDto,
+      role: await this.rolesService.findBy({ name: "USER" }),
+    });
     return createdUser.save();
   }
 

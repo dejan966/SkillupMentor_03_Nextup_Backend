@@ -41,7 +41,6 @@ export class User {
   @Prop({
     type: SchemaM.Types.ObjectId,
     ref: "Role",
-    default: "65b2716d8bd2810fe3bfc9dd",
   })
   @Type(() => Role)
   role: Role;
