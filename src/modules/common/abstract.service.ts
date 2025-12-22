@@ -1,4 +1,5 @@
 import { Injectable, InternalServerErrorException, NotFoundException } from "@nestjs/common";
+import { PaginatedResult } from "interfaces/paginated-result";
 import Logging from "library/Logging";
 import { Model, Types } from "mongoose";
 
@@ -15,7 +16,7 @@ export abstract class AbstractService<T> {
     return await this.model.find().populate(populate).exec();
   }
 
-  async findPaginate(pageNumber: number, populate = "") {
+  async findPaginate(pageNumber: number, populate = ""): Promise<PaginatedResult<T>> {
     const take = 15;
     const skip = take * (pageNumber - 1);
     const search = await this.model.find().populate(populate).limit(take).skip(skip);
@@ -30,7 +31,7 @@ export abstract class AbstractService<T> {
     };
   }
 
-  async findBy(condition, populate = "") {
+  async findBy<TCondition>(condition: TCondition, populate = "") {
     try {
       return await this.model.findOne(condition).populate(populate);
     } catch (error) {

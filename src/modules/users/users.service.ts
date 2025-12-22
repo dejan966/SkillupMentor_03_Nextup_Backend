@@ -15,10 +15,10 @@ import { DecodedIdToken } from "firebase-admin/auth";
 import { FirebaseUserDto } from "./dto/firebase-user.dto";
 
 @Injectable()
-export class UsersService extends AbstractService<User> {
+export class UsersService extends AbstractService<UserDocument> {
   constructor(
     @InjectModel(User.name)
-    private userModel: Model<User>,
+    private userModel: Model<UserDocument>,
     private configService: ConfigService,
     private jwtService: JwtService,
     private readonly utilsService: UtilsService,

@@ -8,7 +8,7 @@ import {
 } from "class-validator";
 
 export const Match = <T>(
-  type: ClassConstructor<T>,
+  _type: ClassConstructor<T>,
   property: (o: T) => any,
   validationOptions?: ValidationOptions,
 ) => {

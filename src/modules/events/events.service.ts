@@ -14,10 +14,10 @@ import Logging from "library/Logging";
 import moment from "moment";
 
 @Injectable()
-export class EventsService extends AbstractService<Event> {
+export class EventsService extends AbstractService<EventDocument> {
   constructor(
     @InjectModel(Event.name)
-    private eventModel: Model<Event>,
+    private eventModel: Model<EventDocument>,
     private readonly usersService: UsersService,
     private readonly utilsService: UtilsService,
     private readonly schedulerRegistry: SchedulerRegistry,
@@ -40,7 +40,7 @@ export class EventsService extends AbstractService<Event> {
     searchValue: string,
     dateValue: string,
     pageNumber = 1,
-  ): Promise<PaginatedResult> {
+  ): Promise<PaginatedResult<EventDocument>> {
     if (dateValue === "") {
       return;
     }
@@ -64,7 +64,7 @@ export class EventsService extends AbstractService<Event> {
     return this.search(options, pageNumber);
   }
 
-  async search(options: any, pageNumber: number) {
+  async search<TOptions>(options: TOptions, pageNumber: number) {
     const take = 3;
     const skip = take * (pageNumber - 1);
 
@@ -162,7 +162,7 @@ export class EventsService extends AbstractService<Event> {
     }
   }
 
-  async scheduleEmail(event, user: UserDocument) {
+  async scheduleEmail(event: EventDocument, user: UserDocument) {
     const subject = "Reminder";
     const text = `Hi<p>Please, dont forget about the event that will be at.</p>`;
     const html = `Hi<p>Please, dont forget about the event that will be at ${
@@ -170,8 +170,8 @@ export class EventsService extends AbstractService<Event> {
     }.</p><p>Your Nextup support team</p>`;
     const sendDate = new Date(event.date);
 
-    const hours = event.hour.toString().split(":");
-    sendDate.setHours(hours[0], hours[1]);
+    const hours = event.hour.split(":");
+    sendDate.setHours(parseInt(hours[0]), parseInt(hours[1]));
     sendDate.setDate(sendDate.getDate() - 1);
 
     const job = new CronJob(sendDate, () => {

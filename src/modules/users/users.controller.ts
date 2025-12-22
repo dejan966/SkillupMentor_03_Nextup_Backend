@@ -30,6 +30,7 @@ import { AuthGuard } from "@nestjs/passport";
 import { RoleGuard } from "modules/auth/guards/role.guard";
 import { UtilsService } from "modules/utils/utils.service";
 import MongooseClassSerializerInterceptor from "interceptors/mongoose.interceptor";
+import { PaginatedResult } from "interfaces/paginated-result";
 
 @Controller("users")
 @UseInterceptors(MongooseClassSerializerInterceptor(User))
@@ -57,7 +58,7 @@ export class UsersController {
 
   @Get()
   @UseGuards(AuthGuard(["jwt", "firebase"]), RoleGuard)
-  async findAll(@Query("page") pageNumber: number) {
+  async findAll(@Query("page") pageNumber: number): Promise<PaginatedResult<UserDocument>> {
     return await this.usersService.findPaginate(
       pageNumber,
       "role created_events events_booked",
@@ -93,7 +94,7 @@ export class UsersController {
 
   @Get(":id")
   @UseGuards(AuthGuard(["jwt", "firebase"]), UserGuard)
-  async findById(@Param("id") _id: Types.ObjectId) {
+  async findById(@Param("id") _id: Types.ObjectId): Promise<UserDocument> {
     const user = await this.usersService.findById(_id, "role created_events events_booked");
     return user;
   }

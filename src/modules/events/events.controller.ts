@@ -27,6 +27,7 @@ import { join } from "path";
 import { Types } from "mongoose";
 import { AuthGuard } from "@nestjs/passport";
 import MongooseClassSerializerInterceptor from "interceptors/mongoose.interceptor";
+import { PaginatedResult } from "interfaces/paginated-result";
 
 @Controller("events")
 @UseInterceptors(MongooseClassSerializerInterceptor(Event))
@@ -58,7 +59,7 @@ export class EventsController {
   }
 
   @Get()
-  async findAll(@Query("page") pageNumber: number) {
+  async findAll(@Query("page") pageNumber: number): Promise<PaginatedResult<EventDocument>> {
     return await this.eventsService.findPaginate(pageNumber, "creator booked_users");
   }
 
@@ -110,7 +111,7 @@ export class EventsController {
   }
 
   @Get(":id")
-  async findOne(@Param("id") _id: Types.ObjectId) {
+  async findOne(@Param("id") _id: Types.ObjectId): Promise<EventDocument> {
     return await this.eventsService.findById(_id, "creator");
   }
 

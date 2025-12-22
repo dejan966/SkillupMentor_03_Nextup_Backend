@@ -1,14 +1,14 @@
 import { Injectable } from "@nestjs/common";
 import { AbstractService } from "modules/common/abstract.service";
-import { Role } from "schemas/role.schema";
+import { Role, RoleDocument } from "schemas/role.schema";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 
 @Injectable()
-export class RolesService extends AbstractService<Role> {
+export class RolesService extends AbstractService<RoleDocument> {
   constructor(
     @InjectModel(Role.name)
-    private roleModel: Model<Role>,
+    private roleModel: Model<RoleDocument>,
   ) {
     super(roleModel);
   }
