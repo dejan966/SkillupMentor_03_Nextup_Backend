@@ -3,6 +3,7 @@ import fs from "fs";
 import Logging from "library/Logging";
 import { diskStorage, Options } from "multer";
 import { extname } from "path";
+import { randomUUID } from "crypto";
 
 type validFileExtensionsType = "png" | "jpg" | "jpeg";
 type validMimeType = "image/png" | "image/jpg" | "image/jpeg";
@@ -15,7 +16,7 @@ export const saveAvatarToStorage: Options = {
     destination: "./uploads/avatars",
     filename(_req, file, callback) {
       // Create unique suffix
-      const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+      const uniqueSuffix = randomUUID();
       // Get file extension
       const ext = extname(file.originalname);
       // Write filename
@@ -37,7 +38,7 @@ export const saveEventImageToStorage: Options = {
     destination: "./uploads/events",
     filename(_req, file, callback) {
       // Create unique suffix
-      const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+      const uniqueSuffix = randomUUID();
       // Get file extension
       const ext = extname(file.originalname);
       // Write filename
