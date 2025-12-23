@@ -15,14 +15,11 @@ import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 import { Types } from "mongoose";
 import Logging from "library/Logging";
-import { Role } from "schemas/role.schema";
-import { RolesService } from "modules/roles/roles.service";
 
 @Injectable()
 export class AuthService {
   constructor(
     private usersService: UsersService,
-    private rolesService: RolesService,
     private jwtService: JwtService,
     private utilsService: UtilsService,
     private configService: ConfigService,
@@ -42,12 +39,7 @@ export class AuthService {
   }
 
   async register(registerUserDto: RegisterUserDto): Promise<UserDocument> {
-    const hashedPassword: string = await this.utilsService.hash(registerUserDto.password);
-    const user = await this.usersService.createUser({
-      ...registerUserDto,
-      password: hashedPassword,
-      role: await this.rolesService.findBy({ name: "USER" }),
-    });
+    const user = await this.usersService.createUser(registerUserDto);
     return user;
   }
 
@@ -76,7 +68,7 @@ export class AuthService {
           break;
         case JwtType.PASSWORD_TOKEN:
           token = await this.jwtService.signAsync(payload, {
-            secret: this.configService.get("JWT_REFRESH_SECRET"),
+            secret: this.configService.get("JWT_PASSWORD_SECRET"),
             expiresIn: "15m",
           });
           break;

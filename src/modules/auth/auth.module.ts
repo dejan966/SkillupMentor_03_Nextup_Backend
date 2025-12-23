@@ -17,7 +17,6 @@ import { RolesModule } from "modules/roles/roles.module";
     UsersModule,
     PassportModule,
     UtilsModule,
-    RolesModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],

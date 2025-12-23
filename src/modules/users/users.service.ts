@@ -29,12 +29,15 @@ export class UsersService extends AbstractService<UserDocument> {
   }
 
   async createUser(createUserDto: CreateUserDto) {
-    const user = await this.findBy({ email: createUserDto.email });
+    const { email, password } = createUserDto;
+    const user = await this.findBy({ email });
     if (user) {
       throw new BadRequestException("User with that email already exists.");
     }
+    const hashedPassword: string = await this.utilsService.hash(password);
     const createdUser = new this.userModel({
       ...createUserDto,
+      password: hashedPassword,
       role: await this.rolesService.findBy({ name: "USER" }),
     });
     return createdUser.save();
@@ -91,7 +94,7 @@ export class UsersService extends AbstractService<UserDocument> {
     const token = await this.jwtService.signAsync(
       { sub: user._id, name: user.email, type },
       {
-        secret: this.configService.get("JWT_REFRESH_SECRET"),
+        secret: this.configService.get("JWT_PASSWORD_SECRET"),
         expiresIn: "900s",
       },
     );
