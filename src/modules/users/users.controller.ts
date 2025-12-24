@@ -26,11 +26,11 @@ import { join } from "path";
 import { Express } from "express";
 import { saveAvatarToStorage, isFileExtensionSafe, removeFile } from "helpers/imageStorage";
 import { Types } from "mongoose";
-import { AuthGuard } from "@nestjs/passport";
 import { RoleGuard } from "modules/auth/guards/role.guard";
 import { UtilsService } from "modules/utils/utils.service";
 import MongooseClassSerializerInterceptor from "interceptors/mongoose.interceptor";
 import { PaginatedResult } from "interfaces/paginated-result";
+import { HybridAuthGuard } from "modules/auth/guards/hybrid.guard";
 
 @Controller("users")
 @UseInterceptors(MongooseClassSerializerInterceptor(User))
@@ -41,7 +41,7 @@ export class UsersController {
   ) {}
 
   @Post()
-  @UseGuards(AuthGuard(["jwt", "firebase"]), RoleGuard)
+  @UseGuards(HybridAuthGuard, RoleGuard)
   async create(@Body() createUserDto: CreateUserDto) {
     const hashedPassword: string = await this.utilsService.hash(createUserDto.password);
     return await this.usersService.createUser({
@@ -51,13 +51,13 @@ export class UsersController {
   }
 
   @Get("me")
-  @UseGuards(AuthGuard(["jwt", "firebase"]))
+  @UseGuards(HybridAuthGuard)
   async getCurrentUser(@GetCurrentUser() user: UserDocument) {
     return user;
   }
 
   @Get()
-  @UseGuards(AuthGuard(["jwt", "firebase"]), RoleGuard)
+  @UseGuards(HybridAuthGuard, RoleGuard)
   async findAll(@Query("page") pageNumber: number): Promise<PaginatedResult<UserDocument>> {
     return await this.usersService.findPaginate(
       pageNumber,
@@ -66,7 +66,7 @@ export class UsersController {
   }
 
   @Post("upload/:id")
-  @UseGuards(AuthGuard(["jwt", "firebase"]), UserGuard)
+  @UseGuards(HybridAuthGuard, UserGuard)
   @UseInterceptors(FileInterceptor("avatar", saveAvatarToStorage))
   @HttpCode(HttpStatus.CREATED)
   async upload(
@@ -93,14 +93,14 @@ export class UsersController {
   }
 
   @Get(":id")
-  @UseGuards(AuthGuard(["jwt", "firebase"]), UserGuard)
+  @UseGuards(HybridAuthGuard, UserGuard)
   async findById(@Param("id") _id: Types.ObjectId): Promise<UserDocument> {
     const user = await this.usersService.findById(_id, "role created_events events_booked");
     return user;
   }
 
   @Patch(":id")
-  @UseGuards(AuthGuard(["jwt", "firebase"]), UserGuard)
+  @UseGuards(HybridAuthGuard, UserGuard)
   async update(@Param("id") _id: Types.ObjectId, @Body() updateUserDto: UpdateUserDto) {
     const user = await this.usersService.findById(_id);
     const { password, new_password, confirm_password } = updateUserDto;
@@ -137,7 +137,7 @@ export class UsersController {
   }
 
   @Delete(":id")
-  @UseGuards(JwtAuthGuard, UserGuard)
+  @UseGuards(HybridAuthGuard, UserGuard)
   async remove(@Param("id") _id: Types.ObjectId) {
     return await this.usersService.remove(_id);
   }

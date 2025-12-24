@@ -29,7 +29,7 @@ import { RolesModule } from "modules/roles/roles.module";
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, LocalStrategy, FirebaseStrategy, JwtStrategy, JwtRefreshStrategy],
+  providers: [AuthService, LocalStrategy, JwtStrategy, JwtRefreshStrategy],
   exports: [AuthService],
 })
 export class AuthModule {}

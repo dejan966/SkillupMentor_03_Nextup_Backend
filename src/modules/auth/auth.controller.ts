@@ -20,8 +20,10 @@ import { LocalAuthGuard } from "./guards/local-auth.guard";
 import { GetCurrentUser } from "decorators/get-current-user.decorator";
 import Logging from "library/Logging";
 import { UsersService } from "modules/users/users.service";
-import { AuthGuard } from "@nestjs/passport";
 import MongooseClassSerializerInterceptor from "interceptors/mongoose.interceptor";
+import { FirebaseUserDto } from "modules/users/dto/firebase-user.dto";
+import { HybridAuthGuard } from "./guards/hybrid.guard";
+import { randomBytes } from "crypto";
 
 @Controller("auth")
 export class AuthController {
@@ -37,7 +39,10 @@ export class AuthController {
   @Public()
   @Post("firebaseLogin")
   @HttpCode(HttpStatus.OK)
-  async firebaseLogin(@Body() body, @Res({ passthrough: true }) res: Response) {
+  async firebaseLogin(
+    @Body() body: FirebaseUserDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     const user_uid = body.uid;
     const display_name = body.displayName;
     const photo_url = body.photoURL;
@@ -59,6 +64,7 @@ export class AuthController {
         );
       }
     }
+    const password = randomBytes(32).toString("hex");
     const newUser = {
       uid: user_uid,
       email: email,
@@ -66,12 +72,12 @@ export class AuthController {
       last_name: surname,
       refresh_token: refresh_token,
       avatar: photo_url,
-      password: "Geslo1234!",
-      confirm_password: "Geslo1234!",
+      password: password,
+      confirm_password: password,
       type: "Google User",
     };
 
-    const u = await this.usersService.createFirebaseUser(newUser);
+    const u = await this.usersService.createUser(newUser);
 
     try {
       res.cookie("access_token", access_token).json(u);
@@ -119,7 +125,7 @@ export class AuthController {
   }
 
   @Post("signout")
-  @UseGuards(AuthGuard(["jwt", "firebase"]))
+  @UseGuards(HybridAuthGuard)
   @HttpCode(HttpStatus.OK)
   async signout(
     @GetCurrentUser() userData: UserDocument,

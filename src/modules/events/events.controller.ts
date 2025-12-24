@@ -25,9 +25,10 @@ import { FileInterceptor } from "@nestjs/platform-express";
 import { saveEventImageToStorage, isFileExtensionSafe, removeFile } from "helpers/imageStorage";
 import { join } from "path";
 import { Types } from "mongoose";
-import { AuthGuard } from "@nestjs/passport";
 import MongooseClassSerializerInterceptor from "interceptors/mongoose.interceptor";
 import { PaginatedResult } from "interfaces/paginated-result";
+import { JwtAuthGuard } from "modules/auth/guards/jwt.guard";
+import { HybridAuthGuard } from "modules/auth/guards/hybrid.guard";
 
 @Controller("events")
 @UseInterceptors(MongooseClassSerializerInterceptor(Event))
@@ -35,7 +36,7 @@ export class EventsController {
   constructor(private readonly eventsService: EventsService) {}
 
   @Post()
-  @UseGuards(AuthGuard(["jwt", "firebase"]))
+  @UseGuards(HybridAuthGuard)
   async create(
     @Body() createEventDto: CreateEventDto,
     @GetCurrentUser() creator: UserDocument,
@@ -53,7 +54,7 @@ export class EventsController {
   }
 
   @Patch("bookUser/:id")
-  @UseGuards(AuthGuard(["jwt", "firebase"]), EventGuard)
+  @UseGuards(HybridAuthGuard, EventGuard)
   async addUser(@Param("id") _id: Types.ObjectId, @GetCurrentUser() user: UserDocument) {
     return await this.eventsService.bookUser(_id, user);
   }
@@ -64,14 +65,14 @@ export class EventsController {
   }
 
   @Get("user/upcomingEvents")
-  @UseGuards(AuthGuard(["jwt", "firebase"]))
+  @UseGuards(HybridAuthGuard)
   async currUserUpcomingEvents(@GetCurrentUser() user: UserDocument) {
     const upcomingEvents = await this.eventsService.currUserUpcomingEvents(user);
     return upcomingEvents;
   }
 
   @Get("user/recentEvents")
-  @UseGuards(AuthGuard(["jwt", "firebase"]))
+  @UseGuards(HybridAuthGuard)
   async currUserRecentEvents(@GetCurrentUser() user: UserDocument) {
     const upcomingEvents = await this.eventsService.currUserRecentEvents(user);
     return upcomingEvents;
@@ -90,7 +91,7 @@ export class EventsController {
   }
 
   @Post("upload/:id")
-  @UseGuards(AuthGuard(["jwt", "firebase"]), EventGuard)
+  @UseGuards(HybridAuthGuard)
   @UseInterceptors(FileInterceptor("image", saveEventImageToStorage))
   @HttpCode(HttpStatus.CREATED)
   async upload(
@@ -116,13 +117,13 @@ export class EventsController {
   }
 
   @Patch(":id")
-  @UseGuards(AuthGuard(["jwt", "firebase"]), EventGuard)
+  @UseGuards(JwtAuthGuard, EventGuard)
   async update(@Param("id") _id: Types.ObjectId, @Body() updateEventDto: UpdateEventDto) {
     return await this.eventsService.update(_id, updateEventDto);
   }
 
   @Delete(":id")
-  @UseGuards(AuthGuard(["jwt", "firebase"]), EventGuard)
+  @UseGuards(JwtAuthGuard, EventGuard)
   async remove(@Param("id") _id: Types.ObjectId) {
     return await this.eventsService.remove(_id);
   }
