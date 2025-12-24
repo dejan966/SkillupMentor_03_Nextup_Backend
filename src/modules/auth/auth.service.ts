@@ -15,11 +15,13 @@ import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 import { Types } from "mongoose";
 import Logging from "library/Logging";
+import { RolesService } from "modules/roles/roles.service";
 
 @Injectable()
 export class AuthService {
   constructor(
     private usersService: UsersService,
+    private rolesService: RolesService,
     private jwtService: JwtService,
     private utilsService: UtilsService,
     private configService: ConfigService,
@@ -39,7 +41,10 @@ export class AuthService {
   }
 
   async register(registerUserDto: RegisterUserDto): Promise<UserDocument> {
-    const user = await this.usersService.createUser(registerUserDto);
+    const user = await this.usersService.createUser({
+      ...registerUserDto,
+      role: await this.rolesService.findBy({ name: "USER" }),
+    });
     return user;
   }
 

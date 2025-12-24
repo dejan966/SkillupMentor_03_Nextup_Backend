@@ -21,6 +21,13 @@ export class CreateUserDto {
   last_name?: string;
 
   @ApiProperty({
+    required: false,
+    description: "Firebase UID",
+  })
+  @IsOptional()
+  uid?: string;
+
+  @ApiProperty({
     required: true,
     description: "The users email",
     example: "john.smith@gmail.com",
@@ -53,10 +60,10 @@ export class CreateUserDto {
   confirm_password: string;
 
   @ApiProperty({
-    required: false,
+    required: true,
     description: "The users role",
     example: "PROGRAMER",
   })
-  @IsOptional()
-  role?: Role;
+  @IsNotEmpty()
+  role: Role;
 }

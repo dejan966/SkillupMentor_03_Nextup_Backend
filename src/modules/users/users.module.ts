@@ -5,16 +5,9 @@ import { MongooseModule } from "@nestjs/mongoose";
 import { User, UserSchema } from "schemas/user.schema";
 import { JwtService } from "@nestjs/jwt";
 import { UtilsModule } from "modules/utils/utils.module";
-import { Role, RoleSchema } from "schemas/role.schema";
-import { RolesModule } from "modules/roles/roles.module";
 
 @Module({
-  imports: [
-    UtilsModule,
-    RolesModule,
-    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
-    MongooseModule.forFeature([{ name: Role.name, schema: RoleSchema }]),
-  ],
+  imports: [UtilsModule, MongooseModule.forFeature([{ name: User.name, schema: UserSchema }])],
   controllers: [UsersController],
   providers: [UsersService, JwtService],
   exports: [UsersService],

@@ -24,10 +24,15 @@ import MongooseClassSerializerInterceptor from "interceptors/mongoose.intercepto
 import { FirebaseUserDto } from "modules/users/dto/firebase-user.dto";
 import { HybridAuthGuard } from "./guards/hybrid.guard";
 import { randomBytes } from "crypto";
+import { RolesService } from "modules/roles/roles.service";
 
 @Controller("auth")
 export class AuthController {
-  constructor(private readonly authService: AuthService, private usersService: UsersService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private usersService: UsersService,
+    private rolesService: RolesService,
+  ) {}
 
   @Public()
   @Post("register")
@@ -75,6 +80,7 @@ export class AuthController {
       password: password,
       confirm_password: password,
       type: "Google User",
+      role: await this.rolesService.findBy({ name: "USER" }),
     };
 
     const u = await this.usersService.createUser(newUser);
