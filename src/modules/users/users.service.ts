@@ -14,6 +14,7 @@ import * as admin from "firebase-admin";
 import { DecodedIdToken } from "firebase-admin/auth";
 import { FirebaseUserDto } from "./dto/firebase-user.dto";
 import { RolesService } from "modules/roles/roles.service";
+import moment from "moment";
 
 @Injectable()
 export class UsersService extends AbstractService<UserDocument> {
@@ -60,7 +61,7 @@ export class UsersService extends AbstractService<UserDocument> {
   }
 
   async getFirebaseUserByUid(uid: string) {
-    const user = await this.findBy({ uid: uid });
+    const user = await this.findBy({ uid: uid }, "created_events");
     return user;
   }
 
@@ -68,8 +69,8 @@ export class UsersService extends AbstractService<UserDocument> {
     if (await this.utilsService.compareHash(user.password_token, hashed_token)) {
       const decoded = this.jwtService.decode(user.password_token);
       const updatedJwtPayload: IJwtPayload = decoded as IJwtPayload;
-      const expires = new Date(updatedJwtPayload.exp * 1000).toLocaleString();
-      const curr = new Date().toLocaleString();
+      const expires = moment(updatedJwtPayload.exp * 1000).toLocaleString();
+      const curr = moment().date().toLocaleString();
       if (user && curr < expires) {
         return true;
       }
@@ -83,8 +84,8 @@ export class UsersService extends AbstractService<UserDocument> {
     if (password_token) {
       const decoded = this.jwtService.decode(password_token);
       const updatedJwtPayload: IJwtPayload = decoded as IJwtPayload;
-      const expires = new Date(updatedJwtPayload.exp * 1000).toLocaleString();
-      const curr = new Date().toLocaleString();
+      const expires = moment(updatedJwtPayload.exp * 1000).toLocaleString();
+      const curr = moment().date().toLocaleString();
       if (curr < expires) {
         throw new BadRequestException("User already requested the token.");
       }

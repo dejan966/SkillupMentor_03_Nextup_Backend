@@ -168,7 +168,8 @@ export class EventsService extends AbstractService<EventDocument> {
     const html = `Hi<p>Please, dont forget about the event that will be at ${
       event.date + " " + event.hour
     }.</p><p>Your Nextup support team</p>`;
-    const sendDate = new Date(event.date);
+
+    const sendDate = moment(event.date).toDate();
 
     const hours = event.hour.split(":");
     sendDate.setHours(parseInt(hours[0]), parseInt(hours[1]));
