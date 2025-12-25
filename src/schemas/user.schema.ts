@@ -1,8 +1,7 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Exclude, Type } from "class-transformer";
-import { HydratedDocument, Schema as SchemaM } from "mongoose";
+import { HydratedDocument, Schema as SchemaM, Types } from "mongoose";
 import { Event } from "./event.schema";
-import { Role } from "./role.schema";
 
 export type UserDocument = HydratedDocument<User>;
 
@@ -42,8 +41,7 @@ export class User {
     type: SchemaM.Types.ObjectId,
     ref: "Role",
   })
-  @Type(() => Role)
-  role: Role;
+  role: Types.ObjectId;
 
   @Prop({ type: [{ type: SchemaM.Types.ObjectId, ref: "Event" }] })
   @Type(() => Event)
@@ -57,8 +55,15 @@ export class User {
 export const UserSchema = SchemaFactory.createForClass(User);
 
 UserSchema.set("toJSON", {
-  transform: (_, ret) => {
+  transform: (doc, ret) => {
     ret._id = ret._id.toString();
+
+    if (doc.populated("role")) {
+      ret.role._id = ret.role._id.toString();
+    } else {
+      ret.role = ret.role.toString();
+    }
+
     return ret;
   },
 });

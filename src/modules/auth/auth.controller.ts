@@ -80,7 +80,7 @@ export class AuthController {
       password: password,
       confirm_password: password,
       type: "Google User",
-      role: await this.rolesService.findBy({ name: "USER" }),
+      role: (await this.rolesService.findBy({ name: "USER" }))._id,
     };
 
     const u = await this.usersService.createUser(newUser);

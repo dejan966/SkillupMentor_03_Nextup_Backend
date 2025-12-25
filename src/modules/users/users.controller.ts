@@ -95,7 +95,7 @@ export class UsersController {
   @Get(":id")
   @UseGuards(HybridAuthGuard, UserGuard)
   async findById(@Param("id") _id: Types.ObjectId): Promise<UserDocument> {
-    const user = await this.usersService.findById(_id, "role created_events events_booked");
+    const user = await this.usersService.findById(_id);
     return user;
   }
 

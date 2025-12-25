@@ -1,7 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsOptional, IsNotEmpty, IsEmail, Matches } from "class-validator";
 import { Match } from "decorators/match.decorator";
-import { Role } from "schemas/role.schema";
+import { Types } from "mongoose";
 
 export class CreateUserDto {
   @ApiProperty({
@@ -65,5 +65,5 @@ export class CreateUserDto {
     example: "PROGRAMER",
   })
   @IsNotEmpty()
-  role: Role;
+  role: Types.ObjectId;
 }
