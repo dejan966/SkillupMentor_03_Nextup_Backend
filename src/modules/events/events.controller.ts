@@ -92,7 +92,7 @@ export class EventsController {
 
   @Post("upload/:id")
   @UseGuards(HybridAuthGuard)
-  @UseInterceptors(FileInterceptor("image", saveEventImageToStorage))
+  @UseInterceptors(FileInterceptor("eventImage", saveEventImageToStorage))
   @HttpCode(HttpStatus.CREATED)
   async upload(
     @UploadedFile() file: Express.Multer.File,

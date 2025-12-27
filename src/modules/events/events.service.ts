@@ -90,9 +90,6 @@ export class EventsService extends AbstractService<EventDocument> {
 
   async updateEventImageId(_id: Types.ObjectId, image: string): Promise<EventDocument> {
     const event = await this.findById(_id);
-    if (image === event.image) {
-      throw new BadRequestException("Images have to be different.");
-    }
 
     const updatedEvent = await this.eventModel.findOneAndUpdate(
       { _id },
