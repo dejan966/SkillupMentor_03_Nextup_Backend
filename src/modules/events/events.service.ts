@@ -89,8 +89,6 @@ export class EventsService extends AbstractService<EventDocument> {
   }
 
   async updateEventImageId(_id: Types.ObjectId, image: string): Promise<EventDocument> {
-    const event = await this.findById(_id);
-
     const updatedEvent = await this.eventModel.findOneAndUpdate(
       { _id },
       { $set: { image: image } },

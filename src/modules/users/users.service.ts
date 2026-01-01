@@ -171,10 +171,6 @@ export class UsersService extends AbstractService<UserDocument> {
   }
 
   async updateUserImageId(_id: Types.ObjectId, avatar: string): Promise<UserDocument> {
-    const user = await this.findById(_id);
-    if (avatar === user.avatar) {
-      throw new BadRequestException("Avatars have to be different.");
-    }
     const updatedUser = await this.userModel.findOneAndUpdate(
       { _id },
       { $set: { avatar: avatar } },

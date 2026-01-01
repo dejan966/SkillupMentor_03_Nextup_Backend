@@ -102,18 +102,7 @@ export class UsersController {
   @Patch(":id")
   @UseGuards(HybridAuthGuard, UserGuard)
   async update(@Param("id") _id: Types.ObjectId, @Body() updateUserDto: UpdateUserDto) {
-    const user = await this.usersService.findById(_id);
-    const { password, new_password, confirm_password } = updateUserDto;
-    if (password && password !== "") {
-      return await this.usersService.updatePassword(user, {
-        password,
-        new_password,
-        confirm_password,
-      });
-    }
-    return await this.usersService.update(_id, {
-      ...updateUserDto,
-    });
+    return await this.usersService.update(_id, updateUserDto);
   }
 
   @Patch("/me/update-password")
@@ -128,6 +117,25 @@ export class UsersController {
     },
   ) {
     return await this.usersService.updatePassword(user, updateUserDto);
+  }
+
+  @Post("me/update-avatar")
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FileInterceptor("avatar", saveAvatarToStorage))
+  async uploadAvatar(
+    @GetCurrentUser() user: UserDocument,
+    @UploadedFile() file: Express.Multer.File,
+  ): Promise<UserDocument> {
+    const filename = file?.filename;
+    if (!filename) throw new BadRequestException("File must be a png, jpg/jpeg");
+
+    const imagesFolderPath = join(process.cwd(), "uploads/avatars");
+    const fullImagePath = join(imagesFolderPath + "/" + file.filename);
+    if (await isFileExtensionSafe(fullImagePath)) {
+      return this.usersService.updateUserImageId(user._id, filename);
+    }
+    removeFile(fullImagePath);
+    throw new BadRequestException("File content does not match extension!");
   }
 
   @Post("me/reset-password")
