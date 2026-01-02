@@ -62,6 +62,7 @@ export class AuthController {
     if (user) {
       try {
         res.cookie("access_token", access_token).json(user);
+        return;
       } catch (err) {
         Logging.error(err);
         throw new InternalServerErrorException(
