@@ -50,7 +50,8 @@ export class AuthService {
 
   async updateRtHash(userId: Types.ObjectId, rt: string): Promise<void> {
     try {
-      await this.usersService.update(userId, { refresh_token: rt });
+      const hashedRt = await this.utilsService.hash(rt);
+      await this.usersService.update(userId, { refresh_token: hashedRt });
     } catch (error) {
       throw new InternalServerErrorException(
         "Something went wrong while updating user refresh token",
@@ -109,35 +110,40 @@ export class AuthService {
       return cookie;
     } catch (error) {
       Logging.error(error);
-      /* if (error?.code === PostgresErrorCode.UniqueViolation) {
-        throw new BadRequestException('User with that email already exists.');
-      }
-      throw new InternalServerErrorException(
-        'Something went wrong while generating a new cookie.',
-      ); */
     }
   }
 
   async refreshTokens(req: Request): Promise<UserDocument> {
-    const user = await this.usersService.findBy({
-      refresh_token: req.cookies.refresh_token,
-    });
+    const decode = await this.jwtService.decode(req.cookies.refresh_token);
+    const user = await this.usersService.findById(decode.sub);
     if (!user) {
       throw new ForbiddenException();
     }
+
     try {
-      await this.jwtService.verifyAsync(user.refresh_token, {
+      await this.jwtService.verifyAsync(req.cookies.refresh_token, {
         secret: this.configService.get("JWT_REFRESH_SECRET"),
       });
     } catch (error) {
       Logging.error(error);
       throw new UnauthorizedException("Something went wrong while refreshing tokens");
     }
-    const token = await this.generateToken(user, JwtType.ACCESS_TOKEN);
-    const cookie = await this.generateCookie(token, CookieType.ACCESS_TOKEN);
+
+    const access_token = await this.generateToken(user, JwtType.ACCESS_TOKEN);
+    const refresh_token = await this.generateToken(user, JwtType.REFRESH_TOKEN);
+
+    const access_token_cookie = await this.generateCookie(
+      access_token,
+      CookieType.ACCESS_TOKEN,
+    );
+    const refresh_token_cookie = await this.generateCookie(
+      refresh_token,
+      CookieType.REFRESH_TOKEN,
+    );
 
     try {
-      req.res.setHeader("Set-Cookie", cookie);
+      await this.updateRtHash(user._id, refresh_token);
+      req.res.setHeader("Set-Cookie", [access_token_cookie, refresh_token_cookie]);
     } catch (error) {
       Logging.error(error);
       throw new InternalServerErrorException(
@@ -147,9 +153,11 @@ export class AuthService {
     return user;
   }
 
-  async firebaseSignout(res: Response): Promise<void> {
+  async firebaseSignout(userId: Types.ObjectId, res: Response): Promise<void> {
+    const user = await this.usersService.findById(userId);
+    await this.usersService.update(user._id, { refresh_token: null });
     try {
-      res.clearCookie("access_token").sendStatus(200);
+      res.setHeader("Set-Cookie", this.getCookiesForSignOut()).sendStatus(200);
     } catch (error) {
       Logging.error(error);
       throw new InternalServerErrorException(
