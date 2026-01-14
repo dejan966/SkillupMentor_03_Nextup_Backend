@@ -3,17 +3,13 @@ import { HydratedDocument } from "mongoose";
 
 export type RoleDocument = HydratedDocument<Role>;
 
-@Schema({ timestamps: { createdAt: "created_at", updatedAt: "updated_at" } })
+@Schema({
+  timestamps: { createdAt: "created_at", updatedAt: "updated_at" },
+  toJSON: { virtuals: true },
+})
 export class Role {
   @Prop({ required: true })
   name: string;
 }
 
 export const RoleSchema = SchemaFactory.createForClass(Role);
-
-RoleSchema.set("toJSON", {
-  transform: (_, ret) => {
-    ret._id = ret._id.toString();
-    return ret;
-  },
-});

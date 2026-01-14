@@ -29,6 +29,7 @@ import MongooseClassSerializerInterceptor from "interceptors/mongoose.intercepto
 import { PaginatedResult } from "interfaces/paginated-result";
 import { JwtAuthGuard } from "modules/auth/guards/jwt.guard";
 import { HybridAuthGuard } from "modules/auth/guards/hybrid.guard";
+import { RoleGuard } from "modules/auth/guards/role.guard";
 
 @Controller("events")
 @UseInterceptors(MongooseClassSerializerInterceptor(Event))
@@ -60,6 +61,7 @@ export class EventsController {
   }
 
   @Get()
+  @UseGuards(HybridAuthGuard, RoleGuard)
   async findAll(@Query("page") pageNumber: number): Promise<PaginatedResult<EventDocument>> {
     return await this.eventsService.findPaginate(pageNumber, "creator booked_users");
   }
@@ -113,6 +115,7 @@ export class EventsController {
 
   @Get(":id")
   async findOne(@Param("id") _id: Types.ObjectId): Promise<EventDocument> {
+    await this.eventsService.updateCreatorId();
     return await this.eventsService.findById(_id, "creator");
   }
 

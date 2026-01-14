@@ -100,7 +100,7 @@ export class EventsService extends AbstractService<EventDocument> {
 
   async currUserUpcomingEvents(user: UserDocument) {
     var momentDate = moment();
-    const date = momentDate.format("YYYY-M-D");
+    const date = momentDate.format("YYYY-MM-D");
 
     const upcomingE = await this.eventModel.find({
       booked_users: { $in: [user._id] },
@@ -110,9 +110,20 @@ export class EventsService extends AbstractService<EventDocument> {
     return upcomingE;
   }
 
+  async updateCreatorId() {
+    await this.eventModel.updateMany(
+      {}, // Only update docs without role_id
+      {
+        $unset: {
+          creator: 1,
+        },
+      },
+    );
+  }
+
   async currUserRecentEvents(user: UserDocument) {
     var momentDate = moment();
-    const date = momentDate.format("YYYY-M-D");
+    const date = momentDate.format("YYYY-MM-D");
     const recentE = await this.eventModel.find({
       booked_users: { $in: [user._id] },
       date: { $lt: date },
@@ -123,7 +134,7 @@ export class EventsService extends AbstractService<EventDocument> {
 
   async upcomingEvents() {
     var momentDate = moment();
-    const date = momentDate.format("YYYY-M-D");
+    const date = momentDate.format("YYYY-MM-D");
     const upcomingE = await this.eventModel.find({
       date: { $gt: date },
     });
@@ -133,7 +144,7 @@ export class EventsService extends AbstractService<EventDocument> {
 
   async recentEvents() {
     var momentDate = moment();
-    const date = momentDate.format("YYYY-M-D");
+    const date = momentDate.format("YYYY-MM-D");
     const recentE = await this.eventModel.find({
       date: { $lt: date },
     });
