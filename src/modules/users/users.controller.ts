@@ -73,16 +73,8 @@ export class UsersController {
     @UploadedFile() file: Express.Multer.File,
     @Param("id") _id: Types.ObjectId,
   ): Promise<UserDocument> {
-    const filename = file?.filename;
-    if (!filename) throw new BadRequestException("File must be a png, jpg/jpeg");
-
-    const imagesFolderPath = join(process.cwd(), "uploads/avatars");
-    const fullImagePath = join(imagesFolderPath + "/" + file.filename);
-    if (await isFileExtensionSafe(fullImagePath)) {
-      return this.usersService.updateUserImageId(_id, filename);
-    }
-    removeFile(fullImagePath);
-    throw new BadRequestException("File content does not match extension!");
+    console.log(file);
+    return await this.usersService.uploadFile(file, _id);
   }
 
   @Get(":id/:token(*)")

@@ -65,7 +65,7 @@ export class AuthController {
         password: password,
         confirm_password: password,
         type: "Google User",
-        role: (await this.rolesService.findBy({ name: "USER" }))._id,
+        role_id: (await this.rolesService.findBy({ name: "USER" }))._id,
       };
       user = await this.usersService.createUser(newUser);
     }

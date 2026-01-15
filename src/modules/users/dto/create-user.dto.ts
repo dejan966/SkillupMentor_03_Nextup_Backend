@@ -65,5 +65,5 @@ export class CreateUserDto {
     example: "PROGRAMER",
   })
   @IsNotEmpty()
-  role: Types.ObjectId;
+  role_id: Types.ObjectId;
 }

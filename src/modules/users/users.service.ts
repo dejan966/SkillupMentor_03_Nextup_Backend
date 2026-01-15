@@ -14,6 +14,8 @@ import * as admin from "firebase-admin";
 import { DecodedIdToken } from "firebase-admin/auth";
 import { FirebaseUserDto } from "./dto/firebase-user.dto";
 import moment from "moment";
+import { isFileExtensionSafe, removeFile } from "helpers/imageStorage";
+import { join } from "path";
 
 @Injectable()
 export class UsersService extends AbstractService<UserDocument> {
@@ -39,6 +41,19 @@ export class UsersService extends AbstractService<UserDocument> {
       password: hashedPassword,
     });
     return createdUser.save();
+  }
+
+  async uploadFile(file: Express.Multer.File, _id: Types.ObjectId) {
+    const filename = file?.filename;
+    if (!filename) throw new BadRequestException("File must be a png, jpg/jpeg");
+
+    const imagesFolderPath = join(process.cwd(), "uploads/avatars");
+    const fullImagePath = join(imagesFolderPath + "/" + file.filename);
+    if (await isFileExtensionSafe(fullImagePath)) {
+      return this.updateUserImageId(_id, filename);
+    }
+    removeFile(fullImagePath);
+    throw new BadRequestException("File content does not match extension!");
   }
 
   async createFirebaseUser(firebaseUserDto: FirebaseUserDto) {
