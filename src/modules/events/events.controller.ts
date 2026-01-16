@@ -30,6 +30,7 @@ import { PaginatedResult } from "interfaces/paginated-result";
 import { JwtAuthGuard } from "modules/auth/guards/jwt.guard";
 import { HybridAuthGuard } from "modules/auth/guards/hybrid.guard";
 import { RoleGuard } from "modules/auth/guards/role.guard";
+import moment from "moment";
 
 @Controller("events")
 @UseInterceptors(MongooseClassSerializerInterceptor(Event))
@@ -66,29 +67,67 @@ export class EventsController {
     return await this.eventsService.findPaginate(pageNumber, "creator booked_users");
   }
 
+  @Get("user/createdEvents")
+  @UseGuards(HybridAuthGuard)
+  async currUserCreatedEvents(
+    @Query("page") pageNumber: number,
+    @GetCurrentUser() user: UserDocument,
+  ) {
+    const createdEvents = await this.eventsService.findByMultiple(pageNumber, {
+      creator_id: user._id,
+    });
+    return createdEvents;
+  }
+
   @Get("user/upcomingEvents")
   @UseGuards(HybridAuthGuard)
-  async currUserUpcomingEvents(@GetCurrentUser() user: UserDocument) {
-    const upcomingEvents = await this.eventsService.currUserUpcomingEvents(user);
+  async currUserUpcomingEvents(
+    @Query("page") pageNumber: number,
+    @GetCurrentUser() user: UserDocument,
+  ) {
+    var momentDate = moment();
+    const date = momentDate.format("YYYY-MM-D");
+
+    const upcomingEvents = await this.eventsService.findByMultiple(pageNumber, {
+      booked_users: { $in: [user._id] },
+      date: { $gt: date },
+    });
     return upcomingEvents;
   }
 
   @Get("user/recentEvents")
   @UseGuards(HybridAuthGuard)
-  async currUserRecentEvents(@GetCurrentUser() user: UserDocument) {
-    const upcomingEvents = await this.eventsService.currUserRecentEvents(user);
-    return upcomingEvents;
+  async currUserRecentEvents(
+    @Query("page") pageNumber: number,
+    @GetCurrentUser() user: UserDocument,
+  ) {
+    var momentDate = moment();
+    const date = momentDate.format("YYYY-MM-D");
+
+    const recentEvents = await this.eventsService.findByMultiple(pageNumber, {
+      booked_users: { $in: [user._id] },
+      date: { $lt: date },
+    });
+    return recentEvents;
   }
 
   @Get("upcomingEvents")
-  async upcomingEvents() {
-    const events = await this.eventsService.upcomingEvents();
+  async upcomingEvents(@Query("page") pageNumber: number) {
+    var momentDate = moment();
+    const date = momentDate.format("YYYY-MM-D");
+    const events = await this.eventsService.findByMultiple(pageNumber, {
+      date: { $gt: date },
+    });
     return events;
   }
 
   @Get("recentEvents")
-  async recentEvents() {
-    const events = await this.eventsService.recentEvents();
+  async recentEvents(@Query("page") pageNumber: number) {
+    var momentDate = moment();
+    const date = momentDate.format("YYYY-MM-D");
+    const events = await this.eventsService.findByMultiple(pageNumber, {
+      date: { $lt: date },
+    });
     return events;
   }
 
@@ -115,7 +154,6 @@ export class EventsController {
 
   @Get(":id")
   async findOne(@Param("id") _id: Types.ObjectId): Promise<EventDocument> {
-    await this.eventsService.updateCreatorId();
     return await this.eventsService.findById(_id, "creator");
   }
 
