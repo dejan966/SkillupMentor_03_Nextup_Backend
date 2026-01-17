@@ -9,6 +9,7 @@ import {
   UseGuards,
   InternalServerErrorException,
   UseInterceptors,
+  Get,
 } from "@nestjs/common";
 import { Public } from "decorators/public.decorator";
 import { Request, Response } from "express";
@@ -145,8 +146,15 @@ export class AuthController {
     return this.authService.signout(userData._id, res);
   }
 
-  @UseGuards(JwtRefreshAuthGuard)
+  @Get("admin")
+  @UseGuards(HybridAuthGuard)
+  async checkAdmin(@GetCurrentUser() user: UserDocument) {
+    const role = await this.rolesService.findBy({ name: "ADMIN" });
+    return user.role_id.equals(role._id);
+  }
+
   @Post("refresh")
+  @UseGuards(JwtRefreshAuthGuard)
   @UseInterceptors(MongooseClassSerializerInterceptor(User))
   @HttpCode(HttpStatus.ACCEPTED)
   async refreshTokens(@Req() req: Request): Promise<UserDocument> {
