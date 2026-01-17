@@ -73,7 +73,7 @@ export class EventsController {
     @Query("page") pageNumber: number,
     @GetCurrentUser() user: UserDocument,
   ) {
-    const createdEvents = await this.eventsService.findByMultiple(pageNumber, {
+    const createdEvents = await this.eventsService.findByMultiplePagination(pageNumber, {
       creator_id: user._id,
     });
     return createdEvents;
@@ -88,7 +88,7 @@ export class EventsController {
     var momentDate = moment();
     const date = momentDate.format("YYYY-MM-D");
 
-    const upcomingEvents = await this.eventsService.findByMultiple(pageNumber, {
+    const upcomingEvents = await this.eventsService.findByMultiplePagination(pageNumber, {
       booked_users: { $in: [user._id] },
       date: { $gt: date },
     });
@@ -104,7 +104,7 @@ export class EventsController {
     var momentDate = moment();
     const date = momentDate.format("YYYY-MM-D");
 
-    const recentEvents = await this.eventsService.findByMultiple(pageNumber, {
+    const recentEvents = await this.eventsService.findByMultiplePagination(pageNumber, {
       booked_users: { $in: [user._id] },
       date: { $lt: date },
     });
@@ -115,7 +115,7 @@ export class EventsController {
   async upcomingEvents(@Query("page") pageNumber: number) {
     var momentDate = moment();
     const date = momentDate.format("YYYY-MM-D");
-    const events = await this.eventsService.findByMultiple(pageNumber, {
+    const events = await this.eventsService.findByMultiplePagination(pageNumber, {
       date: { $gt: date },
     });
     return events;
@@ -125,7 +125,7 @@ export class EventsController {
   async recentEvents(@Query("page") pageNumber: number) {
     var momentDate = moment();
     const date = momentDate.format("YYYY-MM-D");
-    const events = await this.eventsService.findByMultiple(pageNumber, {
+    const events = await this.eventsService.findByMultiplePagination(pageNumber, {
       date: { $lt: date },
     });
     return events;

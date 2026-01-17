@@ -31,7 +31,18 @@ export abstract class AbstractService<T> {
     };
   }
 
-  async findByMultiple<TCondition>(
+  async findByMultiple(condition, populate = "") {
+    try {
+      return await this.model.find(condition).populate(populate);
+    } catch (error) {
+      Logging.error(error);
+      throw new InternalServerErrorException(
+        `Something went wrong while searching for elements with condition: ${condition}.`,
+      );
+    }
+  }
+
+  async findByMultiplePagination<TCondition>(
     pageNumber: number,
     condition: TCondition,
     populate = "",
@@ -61,21 +72,6 @@ export abstract class AbstractService<T> {
         `Something went wrong while searching for an element with condition: ${condition}.`,
       );
     }
-  }
-
-  async paginate(pageNumber: number, populate = ""): Promise<PaginatedResult<T>> {
-    const take = 15;
-    const skip = take * (pageNumber - 1);
-    const search = await this.model.find().populate(populate).limit(take).skip(skip);
-    const searchDocuments = await this.model.countDocuments();
-    return {
-      data: search,
-      meta: {
-        total: searchDocuments,
-        page: pageNumber,
-        last_page: Math.ceil(searchDocuments / take),
-      },
-    };
   }
 
   async findBy<TCondition>(condition: TCondition, populate = "") {
