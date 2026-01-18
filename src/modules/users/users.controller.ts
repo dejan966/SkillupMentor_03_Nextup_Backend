@@ -13,6 +13,7 @@ import {
   UploadedFile,
   UseInterceptors,
   Query,
+  SerializeOptions,
 } from "@nestjs/common";
 import { UsersService } from "./users.service";
 import { CreateUserDto } from "./dto/create-user.dto";
@@ -58,11 +59,9 @@ export class UsersController {
 
   @Get()
   @UseGuards(HybridAuthGuard, RoleGuard)
+  @SerializeOptions({ groups: ["include-role"] })
   async findAll(@Query("page") pageNumber: number): Promise<PaginatedResult<UserDocument>> {
-    return await this.usersService.findPaginate(
-      pageNumber,
-      "role created_events events_booked",
-    );
+    return await this.usersService.findPaginate(pageNumber, "role");
   }
 
   @Post("upload/:id")
@@ -86,6 +85,7 @@ export class UsersController {
 
   @Get(":id")
   @UseGuards(HybridAuthGuard, UserGuard)
+  @SerializeOptions({ groups: ["include-role"] })
   async findById(@Param("id") _id: Types.ObjectId): Promise<UserDocument> {
     const user = await this.usersService.findById(_id);
     return user;

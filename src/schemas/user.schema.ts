@@ -1,7 +1,8 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Exclude, Type } from "class-transformer";
+import { Exclude, Expose, Type } from "class-transformer";
 import { HydratedDocument, Schema as SchemaM, Types } from "mongoose";
 import { Event } from "./event.schema";
+import { Role } from "./role.schema";
 
 export type UserDocument = HydratedDocument<User>;
 
@@ -44,10 +45,12 @@ export class User {
     type: SchemaM.Types.ObjectId,
     ref: "Role",
   })
-  role_id: Types.ObjectId;
+  @Expose({ groups: ["include-role"] })
+  role: Types.ObjectId;
 
   @Prop({ type: [{ type: SchemaM.Types.ObjectId, ref: "Event" }] })
   @Type(() => Event)
+  @Exclude()
   created_events: Event[];
 
   @Prop({ type: [{ type: SchemaM.Types.ObjectId, ref: "Event" }] })
@@ -60,11 +63,4 @@ export const UserSchema = SchemaFactory.createForClass(User);
 
 UserSchema.virtual("full_name").get(function (this: UserDocument) {
   return `${this.first_name} ${this.last_name}`;
-});
-
-UserSchema.virtual("role", {
-  ref: "Role",
-  localField: "role_id",
-  foreignField: "_id",
-  justOne: true,
 });

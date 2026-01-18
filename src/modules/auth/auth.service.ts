@@ -29,7 +29,7 @@ export class AuthService {
 
   async validateUser(email: string, password: string): Promise<UserDocument> {
     Logging.info("Validating user...");
-    const user = await this.usersService.findBy({ email }, "role");
+    const user = await this.usersService.findBy({ email });
     if (!user) {
       throw new BadRequestException("User with this email doesnt exist");
     }
@@ -43,7 +43,7 @@ export class AuthService {
   async register(registerUserDto: RegisterUserDto): Promise<UserDocument> {
     const user = await this.usersService.createUser({
       ...registerUserDto,
-      role_id: (await this.rolesService.findBy({ name: "USER" }))._id,
+      role: (await this.rolesService.findBy({ name: "USER" }))._id,
     });
     return user;
   }
@@ -187,7 +187,7 @@ export class AuthService {
   }
 
   async getUserIfTokenMatches(refreshToken: string, userId: Types.ObjectId) {
-    const user = await this.usersService.findById(userId, "role created_events");
+    const user = await this.usersService.findById(userId);
     const isRefreshTokenMatching = await this.utilsService.compareHash(
       refreshToken,
       user.refresh_token,

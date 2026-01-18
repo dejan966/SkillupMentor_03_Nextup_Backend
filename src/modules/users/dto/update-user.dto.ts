@@ -52,5 +52,5 @@ export class UpdateUserDto {
 
   @ApiProperty({ required: false })
   @IsOptional()
-  role_id?: string;
+  role?: string;
 }

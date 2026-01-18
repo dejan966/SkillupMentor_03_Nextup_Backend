@@ -73,7 +73,7 @@ export class UsersService extends AbstractService<UserDocument> {
   }
 
   async getFirebaseUserByUid(uid: string) {
-    const user = await this.findBy({ uid: uid }, "created_events events_booked role");
+    const user = await this.findBy({ uid: uid });
     return user;
   }
 

@@ -66,7 +66,7 @@ export class AuthController {
         password: password,
         confirm_password: password,
         type: "Google User",
-        role_id: (await this.rolesService.findBy({ name: "USER" }))._id,
+        role: (await this.rolesService.findBy({ name: "USER" }))._id,
       };
       user = await this.usersService.createUser(newUser);
     }
@@ -150,7 +150,7 @@ export class AuthController {
   @UseGuards(HybridAuthGuard)
   async checkAdmin(@GetCurrentUser() user: UserDocument) {
     const role = await this.rolesService.findBy({ name: "ADMIN" });
-    return user.role_id.equals(role._id);
+    return user.role.equals(role._id);
   }
 
   @Post("refresh")
