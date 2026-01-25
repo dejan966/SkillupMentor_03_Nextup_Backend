@@ -2,45 +2,12 @@ import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./modules/app.module";
 import { ValidationPipe } from "@nestjs/common";
 import { ExpressAdapter } from "@nestjs/platform-express";
-import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import serverlessExpress from "@vendia/serverless-express";
 import express from "express";
 import cookieParser from "cookie-parser";
 import * as admin from "firebase-admin";
 
-let server: any;
-
-async function bootstrap() {
-  if (server) return server;
-
-  const expressApp = express();
-  const app = await NestFactory.create(AppModule, new ExpressAdapter(expressApp));
-
-  app.enableCors({
-    origin: [process.env.FRONTEND],
-    credentials: true,
-  });
-
-  app.useGlobalPipes(new ValidationPipe());
-  app.use(cookieParser());
-
-  if (process.env.NODE_ENV !== "production") {
-    const config = new DocumentBuilder()
-      .setTitle("Nextup")
-      .setDescription("This is the Nextup app")
-      .setVersion("1.0.0")
-      .build();
-
-    const document = SwaggerModule.createDocument(app, config);
-    SwaggerModule.setup("swagger", app, document);
-  }
-
-  await app.init();
-
-  server = serverlessExpress({ app: expressApp });
-  return server;
-}
-
+// Initialize Firebase once
 if (!admin.apps.length) {
   admin.initializeApp({
     credential: admin.credential.cert({
@@ -50,6 +17,34 @@ if (!admin.apps.length) {
     }),
     databaseURL: process.env.FIREBASE_DATABASE_URL,
   });
+}
+
+let cachedServer;
+
+async function bootstrap() {
+  if (cachedServer) {
+    return cachedServer;
+  }
+
+  const expressApp = express();
+  const app = await NestFactory.create(
+    AppModule,
+    new ExpressAdapter(expressApp),
+    { logger: ["error", "warn"] }, // Reduce logging in production
+  );
+
+  app.enableCors({
+    origin: process.env.FRONTEND,
+    credentials: true,
+  });
+
+  app.useGlobalPipes(new ValidationPipe());
+  app.use(cookieParser());
+
+  await app.init();
+
+  cachedServer = serverlessExpress({ app: expressApp });
+  return cachedServer;
 }
 
 export default async function handler(req, res) {
