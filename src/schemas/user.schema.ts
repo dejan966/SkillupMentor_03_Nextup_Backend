@@ -1,23 +1,23 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Exclude, Transform, Type } from 'class-transformer';
-import { HydratedDocument, ObjectId, Schema as SchemaM } from 'mongoose';
-import { Event } from './event.schema';
-import { Role } from './role.schema';
+import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+import { Exclude, Expose, Type } from "class-transformer";
+import { HydratedDocument, Schema as SchemaM, Types } from "mongoose";
+import { Event } from "./event.schema";
+import { Role } from "./role.schema";
 
 export type UserDocument = HydratedDocument<User>;
 
-@Schema({ timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } })
+@Schema({
+  timestamps: { createdAt: "created_at", updatedAt: "updated_at" },
+  toJSON: { virtuals: true },
+})
 export class User {
-  @Transform(({ value }) => value.toString())
-  _id: ObjectId;
-
-  @Prop({ default: 'default-profile.png' })
+  @Prop({ default: "default-profile.png" })
   avatar: string;
 
-  @Prop({ default: '' })
+  @Prop({ default: null })
   first_name: string;
 
-  @Prop({ default: '' })
+  @Prop({ default: null })
   last_name: string;
 
   @Prop({ nullable: true })
@@ -26,7 +26,7 @@ export class User {
   @Prop({ required: true, unique: true })
   email: string;
 
-  @Prop({ default: 'Nextup User' })
+  @Prop({ default: "Nextup User" })
   type: string;
 
   @Prop({ required: true })
@@ -43,19 +43,24 @@ export class User {
 
   @Prop({
     type: SchemaM.Types.ObjectId,
-    ref: 'Role',
-    default: '65b2716d8bd2810fe3bfc9dd',
+    ref: "Role",
   })
-  @Type(() => Role)
-  role: Role;
+  @Expose({ groups: ["include-role"] })
+  role: Types.ObjectId;
 
-  @Prop({ type: [{ type: SchemaM.Types.ObjectId, ref: 'Event' }] })
+  @Prop({ type: [{ type: SchemaM.Types.ObjectId, ref: "Event" }] })
   @Type(() => Event)
+  @Exclude()
   created_events: Event[];
 
-  @Prop({ type: [{ type: SchemaM.Types.ObjectId, ref: 'Event' }] })
+  @Prop({ type: [{ type: SchemaM.Types.ObjectId, ref: "Event" }] })
   @Type(() => Event)
+  @Exclude()
   events_booked: Event[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
+
+UserSchema.virtual("full_name").get(function (this: UserDocument) {
+  return `${this.first_name} ${this.last_name}`;
+});
