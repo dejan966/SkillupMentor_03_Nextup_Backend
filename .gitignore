@@ -3,6 +3,9 @@
 /node_modules
 /uploads
 
+# images
+/uploads
+
 # env
 .env.development
 .env.production

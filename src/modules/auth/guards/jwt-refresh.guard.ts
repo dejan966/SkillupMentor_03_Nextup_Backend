@@ -4,7 +4,7 @@ import { AuthGuard } from "@nestjs/passport";
 import { Observable } from "rxjs";
 
 @Injectable()
-export class JwtAuthGuard extends AuthGuard("jwt") {
+export class JwtRefreshAuthGuard extends AuthGuard("jwt-refresh") {
   constructor(private reflector: Reflector) {
     super();
   }
