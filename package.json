@@ -29,7 +29,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "engines": {
-    "node": "18"
+    "node": "24.x"
   },
   "main": "dist/main.js",
   "dependencies": {
