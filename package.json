@@ -15,7 +15,7 @@
     "fb:start": "npm run fb:shell",
     "fb:deploy": "firebase deploy --only functions",
     "fb:logs": "firebase functions:log",
-    "build": "nest build",
+    "build": "npx nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "cross-env STAGE=production nest start",
     "start:dev": "cross-env STAGE=development nest start --watch",
