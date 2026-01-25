@@ -18,20 +18,24 @@ import {
 import { UsersService } from "./users.service";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
-import { GetCurrentUser } from "decorators/get-current-user.decorator";
-import { JwtAuthGuard } from "modules/auth/guards/jwt.guard";
-import { User, UserDocument } from "schemas/user.schema";
-import { UserGuard } from "modules/auth/guards/user.guard";
+import { GetCurrentUser } from "../../decorators/get-current-user.decorator";
+import { JwtAuthGuard } from "../auth/guards/jwt.guard";
+import { User, UserDocument } from "../../schemas/user.schema";
+import { UserGuard } from "../auth/guards/user.guard";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { join } from "path";
 import { Express } from "express";
-import { saveAvatarToStorage, isFileExtensionSafe, removeFile } from "helpers/imageStorage";
+/* import {
+  saveAvatarToStorage,
+  isFileExtensionSafe,
+  removeFile,
+} from "../../helpers/imageStorage"; */
 import { Types } from "mongoose";
-import { RoleGuard } from "modules/auth/guards/role.guard";
-import { UtilsService } from "modules/utils/utils.service";
-import MongooseClassSerializerInterceptor from "interceptors/mongoose.interceptor";
-import { PaginatedResult } from "interfaces/paginated-result";
-import { HybridAuthGuard } from "modules/auth/guards/hybrid.guard";
+import { RoleGuard } from "../auth/guards/role.guard";
+import { UtilsService } from "../utils/utils.service";
+import MongooseClassSerializerInterceptor from "../../interceptors/mongoose.interceptor";
+import { PaginatedResult } from "../../interfaces/paginated-result";
+import { HybridAuthGuard } from "../auth/guards/hybrid.guard";
 
 @Controller("users")
 @UseInterceptors(MongooseClassSerializerInterceptor(User))
@@ -64,7 +68,7 @@ export class UsersController {
     return await this.usersService.findPaginate(pageNumber, "role");
   }
 
-  @Post("upload/:id")
+  /* @Post("upload/:id")
   @UseGuards(HybridAuthGuard, UserGuard)
   @UseInterceptors(FileInterceptor("avatar", saveAvatarToStorage))
   @HttpCode(HttpStatus.CREATED)
@@ -74,7 +78,7 @@ export class UsersController {
   ): Promise<UserDocument> {
     console.log(file);
     return await this.usersService.uploadFile(file, _id);
-  }
+  } */
 
   @Get(":id/:token(*)")
   @UseGuards(JwtAuthGuard, UserGuard)
@@ -111,7 +115,7 @@ export class UsersController {
     return await this.usersService.updatePassword(user, updateUserDto);
   }
 
-  @Post("me/update-avatar")
+  /* @Post("me/update-avatar")
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor("avatar", saveAvatarToStorage))
   async uploadAvatar(
@@ -128,7 +132,7 @@ export class UsersController {
     }
     removeFile(fullImagePath);
     throw new BadRequestException("File content does not match extension!");
-  }
+  } */
 
   @Post("me/reset-password")
   @UseGuards(JwtAuthGuard)

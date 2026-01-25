@@ -11,20 +11,20 @@ import {
   UseInterceptors,
   Get,
 } from "@nestjs/common";
-import { Public } from "decorators/public.decorator";
+import { Public } from "../../decorators/public.decorator";
 import { Request, Response } from "express";
-import { User, UserDocument } from "schemas/user.schema";
-import { CookieType, JwtType, RequestWithUser } from "interfaces/auth.interface";
+import { User, UserDocument } from "../../schemas/user.schema";
+import { CookieType, JwtType, RequestWithUser } from "../../interfaces/auth.interface";
 import { AuthService } from "./auth.service";
 import { RegisterUserDto } from "./dto/register-user.dto";
 import { LocalAuthGuard } from "./guards/local-auth.guard";
-import { GetCurrentUser } from "decorators/get-current-user.decorator";
-import Logging from "library/Logging";
-import { UsersService } from "modules/users/users.service";
-import MongooseClassSerializerInterceptor from "interceptors/mongoose.interceptor";
+import { GetCurrentUser } from "../../decorators/get-current-user.decorator";
+import Logging from "../../library/Logging";
+import { UsersService } from "../users/users.service";
+import MongooseClassSerializerInterceptor from "../../interceptors/mongoose.interceptor";
 import { HybridAuthGuard } from "./guards/hybrid.guard";
 import { randomBytes } from "crypto";
-import { RolesService } from "modules/roles/roles.service";
+import { RolesService } from "../roles/roles.service";
 import { JwtRefreshAuthGuard } from "./guards/jwt-refresh.guard";
 import * as admin from "firebase-admin";
 

@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsOptional, IsEmail, ValidateIf, Matches } from "class-validator";
-import { Match } from "decorators/match.decorator";
+import { Match } from "../../../decorators/match.decorator";
 
 export class UpdateUserDto {
   @ApiProperty({ required: false })

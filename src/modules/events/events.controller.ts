@@ -17,19 +17,23 @@ import {
 import { EventsService } from "./events.service";
 import { CreateEventDto } from "./dto/create-event.dto";
 import { UpdateEventDto } from "./dto/update-event.dto";
-import { EventGuard } from "modules/auth/guards/event.guard";
-import { GetCurrentUser } from "decorators/get-current-user.decorator";
-import { UserDocument } from "schemas/user.schema";
-import { EventDocument, Event } from "schemas/event.schema";
+import { EventGuard } from "../auth/guards/event.guard";
+import { GetCurrentUser } from "../../decorators/get-current-user.decorator";
+import { UserDocument } from "../../schemas/user.schema";
+import { EventDocument, Event } from "../../schemas/event.schema";
 import { FileInterceptor } from "@nestjs/platform-express";
-import { saveEventImageToStorage, isFileExtensionSafe, removeFile } from "helpers/imageStorage";
+/* import {
+  saveEventImageToStorage,
+  isFileExtensionSafe,
+  removeFile,
+} from "../../helpers/imageStorage"; */
 import { join } from "path";
 import { Types } from "mongoose";
-import MongooseClassSerializerInterceptor from "interceptors/mongoose.interceptor";
-import { PaginatedResult } from "interfaces/paginated-result";
-import { JwtAuthGuard } from "modules/auth/guards/jwt.guard";
-import { HybridAuthGuard } from "modules/auth/guards/hybrid.guard";
-import { RoleGuard } from "modules/auth/guards/role.guard";
+import MongooseClassSerializerInterceptor from "../../interceptors/mongoose.interceptor";
+import { PaginatedResult } from "../../interfaces/paginated-result";
+import { JwtAuthGuard } from "../auth/guards/jwt.guard";
+import { HybridAuthGuard } from "../auth/guards/hybrid.guard";
+import { RoleGuard } from "../auth/guards/role.guard";
 import moment from "moment";
 
 @Controller("events")
@@ -131,7 +135,7 @@ export class EventsController {
     return events;
   }
 
-  @Post("upload/:id")
+  /* @Post("upload/:id")
   @UseGuards(HybridAuthGuard)
   @UseInterceptors(FileInterceptor("eventImage", saveEventImageToStorage))
   @HttpCode(HttpStatus.CREATED)
@@ -150,7 +154,7 @@ export class EventsController {
     }
     removeFile(fullImagePath);
     throw new BadRequestException("File content does not match extension!");
-  }
+  } */
 
   @Get(":id")
   async findOne(@Param("id") _id: Types.ObjectId): Promise<EventDocument> {

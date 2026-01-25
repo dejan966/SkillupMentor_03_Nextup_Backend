@@ -8,8 +8,8 @@ import { JwtStrategy } from "./strategies/jwt.strategy";
 import { LocalStrategy } from "./strategies/local.strategy";
 import { JwtRefreshStrategy } from "./strategies/jwt-refresh.strategy";
 import { PassportModule } from "@nestjs/passport";
-import { UtilsModule } from "modules/utils/utils.module";
-import { RolesModule } from "modules/roles/roles.module";
+import { UtilsModule } from "../utils/utils.module";
+import { RolesModule } from "../roles/roles.module";
 
 @Module({
   imports: [

@@ -1,6 +1,6 @@
 import { Request } from "@nestjs/common";
 import { Types } from "mongoose";
-import { UserDocument } from "schemas/user.schema";
+import { UserDocument } from "../schemas/user.schema";
 
 export interface TokenPayload {
   name: string;

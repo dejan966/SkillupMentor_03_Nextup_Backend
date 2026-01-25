@@ -1,16 +1,16 @@
 import { BadRequestException, Injectable, InternalServerErrorException } from "@nestjs/common";
 import { CreateEventDto } from "./dto/create-event.dto";
-import { AbstractService } from "modules/common/abstract.service";
+import { AbstractService } from "../common/abstract.service";
 import { Event, EventDocument } from "schemas/event.schema";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model, Types } from "mongoose";
-import { UserDocument } from "schemas/user.schema";
-import { UsersService } from "modules/users/users.service";
+import { UserDocument } from "../../schemas/user.schema";
+import { UsersService } from "../users/users.service";
 import { CronJob } from "cron";
 import { SchedulerRegistry } from "@nestjs/schedule";
-import { UtilsService } from "modules/utils/utils.service";
-import { PaginatedResult } from "interfaces/paginated-result";
-import Logging from "library/Logging";
+import { UtilsService } from "../utils/utils.service";
+import { PaginatedResult } from "../../interfaces/paginated-result";
+import Logging from "../../library/Logging";
 import moment from "moment";
 
 @Injectable()

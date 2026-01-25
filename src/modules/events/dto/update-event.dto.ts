@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsOptional } from "class-validator";
-import { User } from "schemas/user.schema";
+import { User } from "../../../schemas/user.schema";
 
 export class UpdateEventDto {
   @ApiProperty({ required: false })

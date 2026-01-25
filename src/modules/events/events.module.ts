@@ -4,8 +4,8 @@ import { EventsController } from "./events.controller";
 import { MongooseModule } from "@nestjs/mongoose";
 import { Event, EventSchema } from "schemas/event.schema";
 import { User, UserSchema } from "schemas/user.schema";
-import { UsersModule } from "modules/users/users.module";
-import { UtilsService } from "modules/utils/utils.service";
+import { UsersModule } from "../users/users.module";
+import { UtilsService } from "../utils/utils.service";
 
 @Module({
   imports: [

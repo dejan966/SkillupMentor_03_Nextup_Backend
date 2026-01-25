@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsOptional, IsNotEmpty, IsEmail, Matches } from "class-validator";
-import { Match } from "decorators/match.decorator";
+import { Match } from "../../../decorators/match.decorator";
 import { Types } from "mongoose";
 
 export class CreateUserDto {

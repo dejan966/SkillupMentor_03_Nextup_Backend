@@ -1,6 +1,6 @@
 const FileType = import("file-type");
 import fs from "fs";
-import Logging from "library/Logging";
+import Logging from "../library/Logging";
 import { diskStorage, Options } from "multer";
 import { extname } from "path";
 import { randomUUID } from "crypto";
@@ -11,7 +11,7 @@ type validMimeType = "image/png" | "image/jpg" | "image/jpeg";
 const validFileExtensions: validFileExtensionsType[] = ["png", "jpg", "jpeg"];
 const validMimeTypes: validMimeType[] = ["image/png", "image/jpg", "image/jpeg"];
 
-export const saveAvatarToStorage: Options = {
+/* export const saveAvatarToStorage: Options = {
   storage: diskStorage({
     destination: "./uploads/avatars",
     filename(_req, file, callback) {
@@ -75,4 +75,4 @@ export const removeFile = (fullFilePath: string): void => {
   } catch (error) {
     Logging.error(error);
   }
-};
+}; */

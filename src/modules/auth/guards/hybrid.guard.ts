@@ -1,6 +1,6 @@
 import { Injectable, ExecutionContext, UnauthorizedException } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
-import { UsersService } from "modules/users/users.service";
+import { UsersService } from "../../users/users.service";
 import { JwtAuthGuard } from "./jwt.guard";
 import * as admin from "firebase-admin";
 

@@ -14,10 +14,10 @@ import { RolesService } from "./roles.service";
 import { CreateRoleDto } from "./dto/create-role.dto";
 import { UpdateRoleDto } from "./dto/update-role.dto";
 import { Types } from "mongoose";
-import { RoleGuard } from "modules/auth/guards/role.guard";
-import { Role } from "schemas/role.schema";
-import MongooseClassSerializerInterceptor from "interceptors/mongoose.interceptor";
-import { HybridAuthGuard } from "modules/auth/guards/hybrid.guard";
+import { RoleGuard } from "../auth/guards/role.guard";
+import { Role } from "../../schemas/role.schema";
+import MongooseClassSerializerInterceptor from "../../interceptors/mongoose.interceptor";
+import { HybridAuthGuard } from "../auth/guards/hybrid.guard";
 
 @Controller("roles")
 @UseInterceptors(MongooseClassSerializerInterceptor(Role))

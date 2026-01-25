@@ -5,17 +5,17 @@ import {
   InternalServerErrorException,
   UnauthorizedException,
 } from "@nestjs/common";
-import { UserDocument } from "schemas/user.schema";
+import { UserDocument } from "../../schemas/user.schema";
 import { Request, Response } from "express";
 import { UsersService } from "../users/users.service";
 import { RegisterUserDto } from "./dto/register-user.dto";
-import { UtilsService } from "modules/utils/utils.service";
-import { CookieType, JwtType, TokenPayload } from "interfaces/auth.interface";
+import { UtilsService } from "../utils/utils.service";
+import { CookieType, JwtType, TokenPayload } from "../../interfaces/auth.interface";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 import { Types } from "mongoose";
-import Logging from "library/Logging";
-import { RolesService } from "modules/roles/roles.service";
+import Logging from "../../library/Logging";
+import { RolesService } from "../roles/roles.service";
 
 @Injectable()
 export class AuthService {

@@ -1,6 +1,6 @@
 import { Injectable, InternalServerErrorException, NotFoundException } from "@nestjs/common";
-import { PaginatedResult } from "interfaces/paginated-result";
-import Logging from "library/Logging";
+import { PaginatedResult } from "../../interfaces/paginated-result";
+import Logging from "../../library/Logging";
 import { Model, Types } from "mongoose";
 
 @Injectable()

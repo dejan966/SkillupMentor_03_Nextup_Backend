@@ -1,20 +1,20 @@
 import { BadRequestException, Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import { User, UserDocument } from "schemas/user.schema";
+import { User, UserDocument } from "../../schemas/user.schema";
 import { Model, Types } from "mongoose";
-import { AbstractService } from "modules/common/abstract.service";
+import { AbstractService } from "../common/abstract.service";
 import { CreateUserDto } from "./dto/create-user.dto";
-import { EventDocument } from "schemas/event.schema";
+import { EventDocument } from "../../schemas/event.schema";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
-import { JwtType } from "interfaces/auth.interface";
-import { UtilsService } from "modules/utils/utils.service";
-import { IJwtPayload } from "interfaces/jwt-payload.interface";
+import { JwtType } from "../../interfaces/auth.interface";
+import { UtilsService } from "../utils/utils.service";
+import { IJwtPayload } from "../../interfaces/jwt-payload.interface";
 import * as admin from "firebase-admin";
 import { DecodedIdToken } from "firebase-admin/auth";
 import { FirebaseUserDto } from "./dto/firebase-user.dto";
 import moment from "moment";
-import { isFileExtensionSafe, removeFile } from "helpers/imageStorage";
+/* import { isFileExtensionSafe, removeFile } from "../../helpers/imageStorage"; */
 import { join } from "path";
 
 @Injectable()
@@ -43,7 +43,7 @@ export class UsersService extends AbstractService<UserDocument> {
     return createdUser.save();
   }
 
-  async uploadFile(file: Express.Multer.File, _id: Types.ObjectId) {
+  /* async uploadFile(file: Express.Multer.File, _id: Types.ObjectId) {
     const filename = file?.filename;
     if (!filename) throw new BadRequestException("File must be a png, jpg/jpeg");
 
@@ -54,7 +54,7 @@ export class UsersService extends AbstractService<UserDocument> {
     }
     removeFile(fullImagePath);
     throw new BadRequestException("File content does not match extension!");
-  }
+  } */
 
   async createFirebaseUser(firebaseUserDto: FirebaseUserDto) {
     const user = await this.findBy({ email: firebaseUserDto.email });
