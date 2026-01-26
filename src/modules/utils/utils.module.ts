@@ -10,7 +10,6 @@ import { MongooseModule } from "@nestjs/mongoose";
     ScheduleModule.forRoot(),
     ConfigModule.forRoot({
       isGlobal: true,
-      ignoreEnvFile: true,
     }),
     MailerModule.forRoot({
       transport: {
@@ -25,6 +24,7 @@ import { MongooseModule } from "@nestjs/mongoose";
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => {
+        console.log(configService.get<string>("MONGOOSE_DATABASE_URL"));
         const uri = configService.get<string>("MONGOOSE_DATABASE_URL");
         return {
           uri: uri,
