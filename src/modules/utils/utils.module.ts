@@ -1,7 +1,7 @@
 import { MailerModule } from "@nestjs-modules/mailer";
 import { Module } from "@nestjs/common";
 import { UtilsService } from "./utils.service";
-import { ConfigModule, ConfigService } from "@nestjs/config";
+import { ConfigModule } from "@nestjs/config";
 import { ScheduleModule } from "@nestjs/schedule";
 import { MongooseModule } from "@nestjs/mongoose";
 
@@ -20,17 +20,7 @@ import { MongooseModule } from "@nestjs/mongoose";
         },
       },
     }),
-    MongooseModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: async (configService: ConfigService) => {
-        console.log(configService.get<string>("MONGOOSE_DATABASE_URL"));
-        const uri = configService.get<string>("MONGOOSE_DATABASE_URL");
-        return {
-          uri: uri,
-        };
-      },
-    }),
+    MongooseModule.forRoot(process.env.MONGOOSE_DATABASE_URL),
   ],
   controllers: [],
   providers: [UtilsService],
