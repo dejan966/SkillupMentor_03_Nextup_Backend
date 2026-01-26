@@ -9,7 +9,7 @@ import cookieParser from "cookie-parser";
 import * as admin from "firebase-admin";
 
 async function bootstrap() {
-  console.log(process.env.RAILWAY_SERVICE_NAME);
+  console.log("Total env vars:", Object.keys(process.env).length);
   const app = await NestFactory.create(AppModule, new ExpressAdapter());
 
   app.enableCors({
