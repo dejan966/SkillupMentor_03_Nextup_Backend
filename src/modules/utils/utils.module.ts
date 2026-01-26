@@ -10,7 +10,7 @@ import { MongooseModule } from "@nestjs/mongoose";
     ScheduleModule.forRoot(),
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: [`.env.${process.env.STAGE}`],
+      envFilePath: [".env"],
     }),
     MailerModule.forRoot({
       transport: {
