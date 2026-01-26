@@ -10,7 +10,7 @@ import { MongooseModule } from "@nestjs/mongoose";
     ScheduleModule.forRoot(),
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: [".env"],
+      ignoreEnvFile: process.env.RAILWAY_ENVIRONMENT === "production",
     }),
     MailerModule.forRoot({
       transport: {
