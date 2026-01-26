@@ -32,10 +32,10 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup("/", app, document);
 
-  const PORT = process.env.PORT || 8080;
-  await app.listen(PORT);
   const configService = app.get(ConfigService);
   console.log("ConfigService FRONTEND:", configService.get("FRONTEND"));
+  const PORT = process.env.PORT || 8080;
+  await app.listen(PORT);
 }
 
 /* admin.initializeApp({
