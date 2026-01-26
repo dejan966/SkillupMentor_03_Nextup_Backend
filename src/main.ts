@@ -7,7 +7,6 @@ import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import path from "path";
 import cookieParser from "cookie-parser";
 import * as admin from "firebase-admin";
-import { ConfigService } from "@nestjs/config";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, new ExpressAdapter());
@@ -32,8 +31,6 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup("/", app, document);
 
-  const configService = app.get(ConfigService);
-  console.log("ConfigService FRONTEND:", configService.get("FRONTEND"));
   const PORT = process.env.PORT || 8080;
   await app.listen(PORT);
 }
