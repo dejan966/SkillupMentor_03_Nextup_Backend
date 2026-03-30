@@ -99,7 +99,7 @@ export class EventsService extends AbstractService<EventDocument> {
   }
 
   async upcomingEvents() {
-    var momentDate = moment();
+    const momentDate = moment();
     const date = momentDate.format("YYYY-MM-D");
     const upcomingE = await this.eventModel.find({
       date: { $gt: date },
@@ -109,7 +109,7 @@ export class EventsService extends AbstractService<EventDocument> {
   }
 
   async recentEvents() {
-    var momentDate = moment();
+    const momentDate = moment();
     const date = momentDate.format("YYYY-MM-D");
     const recentE = await this.eventModel.find({
       date: { $lt: date },

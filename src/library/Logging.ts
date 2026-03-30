@@ -1,7 +1,7 @@
 import moment from "moment";
 
 const chalk = import("chalk").then((m) => m.default);
-var momentDate = moment();
+const momentDate = moment();
 momentDate.locale("sl");
 const date = momentDate.format("L, LTS");
 

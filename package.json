@@ -23,6 +23,7 @@
     "start:debug": "nest start --debug --watch",
     "start:prod": "cross-env STAGE=production nest start",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
+    "check-types": "tsc --pretty --noEmit",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",

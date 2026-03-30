@@ -89,7 +89,7 @@ export class EventsController {
     @Query("page") pageNumber: number,
     @GetCurrentUser() user: UserDocument,
   ) {
-    var momentDate = moment();
+    const momentDate = moment();
     const date = momentDate.format("YYYY-MM-D");
 
     const upcomingEvents = await this.eventsService.findByMultiplePagination(pageNumber, {
@@ -105,7 +105,7 @@ export class EventsController {
     @Query("page") pageNumber: number,
     @GetCurrentUser() user: UserDocument,
   ) {
-    var momentDate = moment();
+    const momentDate = moment();
     const date = momentDate.format("YYYY-MM-D");
 
     const recentEvents = await this.eventsService.findByMultiplePagination(pageNumber, {
@@ -117,7 +117,7 @@ export class EventsController {
 
   @Get("upcomingEvents")
   async upcomingEvents(@Query("page") pageNumber: number) {
-    var momentDate = moment();
+    const momentDate = moment();
     const date = momentDate.format("YYYY-MM-D");
     const events = await this.eventsService.findByMultiplePagination(pageNumber, {
       date: { $gt: date },
@@ -127,7 +127,7 @@ export class EventsController {
 
   @Get("recentEvents")
   async recentEvents(@Query("page") pageNumber: number) {
-    var momentDate = moment();
+    const momentDate = moment();
     const date = momentDate.format("YYYY-MM-D");
     const events = await this.eventsService.findByMultiplePagination(pageNumber, {
       date: { $lt: date },
