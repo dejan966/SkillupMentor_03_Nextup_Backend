@@ -1,5 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsNotEmpty } from "class-validator";
+import { Types } from "mongoose";
 
 export class CreatePermissionDto {
   @ApiProperty({
@@ -9,4 +10,12 @@ export class CreatePermissionDto {
   })
   @IsNotEmpty()
   name: string;
+
+  @ApiProperty({
+    required: true,
+    description: "The role to which you assign the permission",
+    example: "PROGRAMER",
+  })
+  @IsNotEmpty()
+  role: Types.ObjectId;
 }
