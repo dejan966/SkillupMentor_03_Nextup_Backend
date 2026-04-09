@@ -1,18 +1,18 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty } from "class-validator";
+import { IsNotEmpty, IsOptional } from "class-validator";
 import { Types } from "mongoose";
 
 export class UpdatePermissionDto {
   @ApiProperty({
     required: false,
   })
-  @IsNotEmpty()
+  @IsOptional()
   name: string;
 
   @ApiProperty({
     required: false,
-    example: "PROGRAMER",
+    example: "bla bla",
   })
-  @IsNotEmpty()
-  role: Types.ObjectId;
+  @IsOptional()
+  description: string;
 }

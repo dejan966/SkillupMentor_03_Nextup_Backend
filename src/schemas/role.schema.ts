@@ -3,6 +3,7 @@ import { HydratedDocument, Schema as SchemaM, Types } from "mongoose";
 import { User } from "./user.schema";
 import { Type } from "class-transformer";
 import { Permission } from "./permission.schema";
+import { RolePermissions } from "./roles_permissions.schema";
 
 export type RoleDocument = HydratedDocument<Role>;
 
@@ -18,9 +19,9 @@ export class Role {
   @Type(() => User)
   users: User[];
 
-  @Prop({ type: [{ type: SchemaM.Types.ObjectId, ref: "Permission" }] })
-  @Type(() => Permission)
-  permissions: Permission[];
+  @Prop({ type: [{ type: SchemaM.Types.ObjectId, ref: "RolePermissions" }] })
+  @Type(() => RolePermissions)
+  permissions: RolePermissions[];
 }
 
 export const RoleSchema = SchemaFactory.createForClass(Role);
