@@ -19,7 +19,7 @@ export class Role {
   @Type(() => User)
   users: User[];
 
-  @Prop({ type: [{ type: SchemaM.Types.ObjectId, ref: "RolePermissions" }] })
+  @Prop({ type: [{ type: SchemaM.Types.ObjectId, ref: "RolesPermissions" }] })
   @Type(() => RolePermissions)
   permissions: RolePermissions[];
 }

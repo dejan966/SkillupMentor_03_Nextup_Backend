@@ -3,17 +3,25 @@ import { RolesPermissionsService } from "./roles_permissions.service";
 import { CreateRolesPermissionDto } from "./dto/create-roles_permission.dto";
 import { UpdateRolesPermissionDto } from "./dto/update-roles_permission.dto";
 import { Types } from "mongoose";
-import { HybridAuthGuard } from "modules/auth/guards/hybrid.guard";
-import { RoleGuard } from "modules/auth/guards/role.guard";
+import { HybridAuthGuard } from "../auth/guards/hybrid.guard";
+import { RoleGuard } from "../auth/guards/role.guard";
+import { RolesService } from "../roles/roles.service";
 
 @Controller("roles-permissions")
 export class RolesPermissionsController {
-  constructor(private readonly rolesPermissionsService: RolesPermissionsService) {}
+  constructor(
+    private readonly rolesPermissionsService: RolesPermissionsService,
+    private rolesService: RolesService,
+  ) {}
 
   @Post()
   @UseGuards(HybridAuthGuard, RoleGuard)
   async create(@Body() createRolesPermissionDto: CreateRolesPermissionDto) {
-    return await this.rolesPermissionsService.create(createRolesPermissionDto);
+    const r_p = await this.rolesPermissionsService.create(createRolesPermissionDto);
+    const role = await this.rolesService.findById(createRolesPermissionDto.role_id);
+    await role.updateOne({
+      $push: { permissions: r_p._id },
+    });
   }
 
   @Get()

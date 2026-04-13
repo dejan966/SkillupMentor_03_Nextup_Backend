@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty } from "class-validator";
+import { IsNotEmpty, IsOptional } from "class-validator";
 import { Types } from "mongoose";
 
 export class CreateRolesPermissionDto {
@@ -18,4 +18,18 @@ export class CreateRolesPermissionDto {
   })
   @IsNotEmpty()
   permission_id: Types.ObjectId;
+
+  @ApiProperty({
+    required: true,
+    description: "Who granted the role",
+  })
+  @IsNotEmpty()
+  granted_by: Types.ObjectId;
+
+  @ApiProperty({
+    required: false,
+    description: "When it expires",
+  })
+  @IsOptional()
+  expires_at: Date;
 }
