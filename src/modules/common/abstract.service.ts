@@ -16,10 +16,23 @@ export abstract class AbstractService<T> {
     return await this.model.find().populate(populate).exec();
   }
 
-  async findPaginate(pageNumber: number, populate = ""): Promise<PaginatedResult<T>> {
+  async findPaginate(
+    pageNumber: number,
+    populate = "",
+    subpopulate = "",
+  ): Promise<PaginatedResult<T>> {
     const take = 15;
     const skip = take * (pageNumber - 1);
-    const search = await this.model.find().populate(populate).limit(take).skip(skip);
+    const search = await this.model
+      .find()
+      .populate({
+        path: populate,
+        populate: {
+          path: subpopulate,
+        },
+      })
+      .limit(take)
+      .skip(skip);
     const searchDocuments = await this.model.countDocuments();
     return {
       data: search,

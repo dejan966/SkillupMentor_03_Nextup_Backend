@@ -9,6 +9,7 @@ import {
   UseGuards,
   Query,
   UseInterceptors,
+  SerializeOptions,
 } from "@nestjs/common";
 import { RolesService } from "./roles.service";
 import { CreateRoleDto } from "./dto/create-role.dto";
@@ -32,12 +33,14 @@ export class RolesController {
 
   @Get()
   @UseGuards(HybridAuthGuard, RoleGuard)
+  @SerializeOptions({ groups: ["include-users", "include-permissions"] })
   async findAll(@Query("page") pageNumber: number) {
     return await this.rolesService.findPaginate(pageNumber);
   }
 
   @Get(":id")
   @UseGuards(HybridAuthGuard, RoleGuard)
+  @SerializeOptions({ groups: ["include-permissions"] })
   async findOne(@Param("id") _id: Types.ObjectId) {
     return await this.rolesService.findById(_id);
   }

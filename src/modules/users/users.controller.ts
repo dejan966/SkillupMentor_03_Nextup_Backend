@@ -65,7 +65,7 @@ export class UsersController {
   @UseGuards(HybridAuthGuard, RoleGuard)
   @SerializeOptions({ groups: ["include-role"] })
   async findAll(@Query("page") pageNumber: number): Promise<PaginatedResult<UserDocument>> {
-    return await this.usersService.findPaginate(pageNumber, "role");
+    return await this.usersService.findPaginate(pageNumber, "role", "permissions");
   }
 
   /* @Post("upload/:id")
