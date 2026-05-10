@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from "@nestjs/common";
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  SerializeOptions,
+} from "@nestjs/common";
 import { RolesPermissionsService } from "./roles_permissions.service";
 import { CreateRolesPermissionDto } from "./dto/create-roles_permission.dto";
 import { UpdateRolesPermissionDto } from "./dto/update-roles_permission.dto";
@@ -18,16 +28,16 @@ export class RolesPermissionsController {
   @UseGuards(HybridAuthGuard, RoleGuard)
   async create(@Body() createRolesPermissionDto: CreateRolesPermissionDto) {
     const r_p = await this.rolesPermissionsService.create(createRolesPermissionDto);
-    const role = await this.rolesService.findById(createRolesPermissionDto.role_id);
+    const role = await this.rolesService.findById(createRolesPermissionDto.role);
     await role.updateOne({
       $push: { permissions: r_p._id },
     });
   }
 
   @Get()
-  @UseGuards(HybridAuthGuard, RoleGuard)
+  //@UseGuards(HybridAuthGuard, RoleGuard)
   async findAll() {
-    return await this.rolesPermissionsService.findAll();
+    return await this.rolesPermissionsService.findAll("permission role");
   }
 
   @Get(":id")

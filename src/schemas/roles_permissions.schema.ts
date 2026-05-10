@@ -8,23 +8,18 @@ export type RolePermissionDocument = HydratedDocument<RolePermissions>;
   toJSON: { virtuals: true },
 })
 export class RolePermissions {
-  @Prop({ required: true })
   @Prop({
     type: SchemaM.Types.ObjectId,
     ref: "Role",
   })
-  role_id: Types.ObjectId;
+  role: Types.ObjectId;
 
-  @Prop({
-    required: true,
-  })
   @Prop({
     type: SchemaM.Types.ObjectId,
     ref: "Permission",
   })
-  permission_id: Types.ObjectId;
+  permission: Types.ObjectId;
 
-  @Prop({ required: true })
   @Prop({
     type: SchemaM.Types.ObjectId,
     ref: "User",

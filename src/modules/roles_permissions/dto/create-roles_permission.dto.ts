@@ -9,7 +9,7 @@ export class CreateRolesPermissionDto {
     example: "PROGRAMER",
   })
   @IsNotEmpty()
-  role_id: Types.ObjectId;
+  role: Types.ObjectId;
 
   @ApiProperty({
     required: true,
@@ -17,7 +17,7 @@ export class CreateRolesPermissionDto {
     example: "CREATE",
   })
   @IsNotEmpty()
-  permission_id: Types.ObjectId;
+  permission: Types.ObjectId;
 
   @ApiProperty({
     required: true,

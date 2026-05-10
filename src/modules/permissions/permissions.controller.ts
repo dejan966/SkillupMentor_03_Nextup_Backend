@@ -9,6 +9,7 @@ import {
   UseInterceptors,
   UseGuards,
   Query,
+  SerializeOptions,
 } from "@nestjs/common";
 import { PermissionsService } from "./permissions.service";
 import { CreatePermissionDto } from "./dto/create-permission.dto";
@@ -32,8 +33,9 @@ export class PermissionsController {
 
   @Get()
   @UseGuards(HybridAuthGuard, RoleGuard)
+  @SerializeOptions({ groups: ["include-roles"] })
   async findAll(@Query("page") pageNumber: number) {
-    return await this.permissionsService.findPaginate(pageNumber);
+    return await this.permissionsService.findPaginate(pageNumber, "roles");
   }
 
   @Get(":id")

@@ -9,7 +9,7 @@ export class UpdateRolesPermissionDto {
     example: "PROGRAMER",
   })
   @IsOptional()
-  role_id?: Types.ObjectId;
+  role?: Types.ObjectId;
 
   @ApiProperty({
     required: false,
@@ -17,5 +17,5 @@ export class UpdateRolesPermissionDto {
     example: "CREATE",
   })
   @IsOptional()
-  permission_id?: Types.ObjectId;
+  permission?: Types.ObjectId;
 }

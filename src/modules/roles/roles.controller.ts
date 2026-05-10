@@ -35,7 +35,7 @@ export class RolesController {
   @UseGuards(HybridAuthGuard, RoleGuard)
   @SerializeOptions({ groups: ["include-users", "include-permissions"] })
   async findAll(@Query("page") pageNumber: number) {
-    return await this.rolesService.findPaginate(pageNumber);
+    return await this.rolesService.findPaginate(pageNumber, "permissions", "permission role");
   }
 
   @Get(":id")

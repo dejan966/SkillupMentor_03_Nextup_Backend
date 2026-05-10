@@ -2,7 +2,6 @@ import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Exclude, Expose, Type } from "class-transformer";
 import { HydratedDocument, Schema as SchemaM, Types } from "mongoose";
 import { Event } from "./event.schema";
-import { Role } from "./role.schema";
 
 export type UserDocument = HydratedDocument<User>;
 

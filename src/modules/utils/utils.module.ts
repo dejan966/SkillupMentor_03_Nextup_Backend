@@ -10,6 +10,7 @@ import { MongooseModule } from "@nestjs/mongoose";
     ScheduleModule.forRoot(),
     ConfigModule.forRoot({
       isGlobal: true,
+      envFilePath: [`.env.${process.env.STAGE}`],
     }),
     MailerModule.forRoot({
       transport: {
@@ -20,7 +21,7 @@ import { MongooseModule } from "@nestjs/mongoose";
         },
       },
     }),
-    MongooseModule.forRoot(process.env.MONGOOSE_DATABASE_URL),
+    MongooseModule.forRoot(process.env.DATABASE_URL),
   ],
   controllers: [],
   providers: [UtilsService],
