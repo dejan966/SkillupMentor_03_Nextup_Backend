@@ -9,7 +9,6 @@ import {
   UseGuards,
   UseInterceptors,
   UploadedFile,
-  BadRequestException,
   HttpCode,
   HttpStatus,
   Query,
@@ -22,12 +21,7 @@ import { GetCurrentUser } from "../../decorators/get-current-user.decorator";
 import { UserDocument } from "../../schemas/user.schema";
 import { EventDocument, Event } from "../../schemas/event.schema";
 import { FileInterceptor } from "@nestjs/platform-express";
-import {
-  saveEventImageToStorage,
-  isFileExtensionSafe,
-  removeFile,
-} from "../../helpers/imageStorage";
-import { join } from "path";
+import { extname, join } from "path";
 import { Types } from "mongoose";
 import MongooseClassSerializerInterceptor from "../../interceptors/mongoose.interceptor";
 import { PaginatedResult } from "../../interfaces/paginated-result";
@@ -35,11 +29,14 @@ import { JwtAuthGuard } from "../auth/guards/jwt.guard";
 import { HybridAuthGuard } from "../auth/guards/hybrid.guard";
 import { RoleGuard } from "../auth/guards/role.guard";
 import moment from "moment";
+import { UtilsService } from "../utils/utils.service";
+import { memoryStorage } from "multer";
+import { randomUUID } from "crypto";
 
 @Controller("events")
 @UseInterceptors(MongooseClassSerializerInterceptor(Event))
 export class EventsController {
-  constructor(private readonly eventsService: EventsService) {}
+  constructor(private readonly eventsService: EventsService, private readonly utilsService: UtilsService) {}
 
   @Post()
   @UseGuards(HybridAuthGuard)
@@ -137,13 +134,22 @@ export class EventsController {
 
   @Post("upload/:id")
   @UseGuards(HybridAuthGuard)
-  @UseInterceptors(FileInterceptor("eventImage", saveEventImageToStorage))
+  @UseInterceptors(FileInterceptor("eventImage", {storage: memoryStorage()}) )
   @HttpCode(HttpStatus.CREATED)
   async upload(
     @UploadedFile() file: Express.Multer.File,
     @Param("id") _id: Types.ObjectId,
   ): Promise<EventDocument> {
-    const filename = file?.filename;
+    try {
+      const uniqueSuffix = randomUUID();
+      const ext = extname(file.originalname);
+      const filename = `${uniqueSuffix}${ext}`;
+      await this.utilsService.uploadFileToS3(file, filename)
+      return this.eventsService.updateEventImageId(_id, filename);
+    } catch (error) {
+      console.log(error)
+    }
+    /* const filename = file?.filename;
 
     if (!filename) throw new BadRequestException("File must be a png, jpg/jpeg");
 
@@ -152,8 +158,8 @@ export class EventsController {
     if (await isFileExtensionSafe(fullImagePath)) {
       return this.eventsService.updateEventImageId(_id, filename);
     }
-    removeFile(fullImagePath);
-    throw new BadRequestException("File content does not match extension!");
+    removeFile(fullImagePath); */
+    //throw new BadRequestException("File content does not match extension!");
   }
 
   @Get(":id")

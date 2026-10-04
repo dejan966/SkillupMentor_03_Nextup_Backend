@@ -2,9 +2,18 @@ import { ISendMailOptions, MailerService } from "@nestjs-modules/mailer";
 import { Injectable, InternalServerErrorException } from "@nestjs/common";
 import * as bcrypt from "bcrypt";
 import Logging from "../../library/Logging";
+import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 
 @Injectable()
 export class UtilsService {
+  private readonly s3 = new S3Client({
+    region: process.env.AWS_REGION,
+    credentials: {
+      accessKeyId: process.env.AWS_ACCESS_KEY,
+      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
+    },
+  });
+  
   constructor(private mailerService: MailerService) {}
   async hash(data: string, salt = 10) {
     try {
@@ -32,6 +41,25 @@ export class UtilsService {
     } catch (error) {
       Logging.error(error);
       throw new InternalServerErrorException("Something went wrong while sending the email.");
+    }
+  }
+
+  async uploadFileToS3(file: Express.Multer.File, filename: string)
+  {
+    const bucketName = process.env.AWS_BUCKET_NAME;
+    const key = `uploads/events/${filename}`;
+
+    try {
+      await this.s3.send(
+        new PutObjectCommand({
+            Bucket: bucketName,
+            Key: key,
+            Body: file.buffer,
+            ContentType: file.mimetype,
+        }),
+      );
+    } catch (error) {
+      console.log(error)
     }
   }
 }
