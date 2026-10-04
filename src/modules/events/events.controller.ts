@@ -22,11 +22,11 @@ import { GetCurrentUser } from "../../decorators/get-current-user.decorator";
 import { UserDocument } from "../../schemas/user.schema";
 import { EventDocument, Event } from "../../schemas/event.schema";
 import { FileInterceptor } from "@nestjs/platform-express";
-/* import {
+import {
   saveEventImageToStorage,
   isFileExtensionSafe,
   removeFile,
-} from "../../helpers/imageStorage"; */
+} from "../../helpers/imageStorage";
 import { join } from "path";
 import { Types } from "mongoose";
 import MongooseClassSerializerInterceptor from "../../interceptors/mongoose.interceptor";
@@ -135,7 +135,7 @@ export class EventsController {
     return events;
   }
 
-  /* @Post("upload/:id")
+  @Post("upload/:id")
   @UseGuards(HybridAuthGuard)
   @UseInterceptors(FileInterceptor("eventImage", saveEventImageToStorage))
   @HttpCode(HttpStatus.CREATED)
@@ -154,7 +154,7 @@ export class EventsController {
     }
     removeFile(fullImagePath);
     throw new BadRequestException("File content does not match extension!");
-  } */
+  }
 
   @Get(":id")
   async findOne(@Param("id") _id: Types.ObjectId): Promise<EventDocument> {
