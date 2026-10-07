@@ -7,13 +7,13 @@ import {
   Param,
   Delete,
   UseGuards,
-  BadRequestException,
   HttpCode,
   HttpStatus,
   UploadedFile,
   UseInterceptors,
   Query,
   SerializeOptions,
+  InternalServerErrorException,
 } from "@nestjs/common";
 import { UsersService } from "./users.service";
 import { CreateUserDto } from "./dto/create-user.dto";
@@ -23,19 +23,17 @@ import { JwtAuthGuard } from "../auth/guards/jwt.guard";
 import { User, UserDocument } from "../../schemas/user.schema";
 import { UserGuard } from "../auth/guards/user.guard";
 import { FileInterceptor } from "@nestjs/platform-express";
-import { join } from "path";
+import { extname } from "path";
 import { Express } from "express";
-/* import {
-  saveAvatarToStorage,
-  isFileExtensionSafe,
-  removeFile,
-} from "../../helpers/imageStorage"; */
 import { Types } from "mongoose";
 import { RoleGuard } from "../auth/guards/role.guard";
 import { UtilsService } from "../utils/utils.service";
 import MongooseClassSerializerInterceptor from "../../interceptors/mongoose.interceptor";
 import { PaginatedResult } from "../../interfaces/paginated-result";
 import { HybridAuthGuard } from "../auth/guards/hybrid.guard";
+import { memoryStorage } from "multer";
+import { randomUUID } from "crypto";
+import Logging from "library/Logging";
 
 @Controller("users")
 @UseInterceptors(MongooseClassSerializerInterceptor(User))
@@ -68,17 +66,27 @@ export class UsersController {
     return await this.usersService.findPaginate(pageNumber, "role", "permissions");
   }
 
-  /* @Post("upload/:id")
+  @Post("upload/:id")
   @UseGuards(HybridAuthGuard, UserGuard)
-  @UseInterceptors(FileInterceptor("avatar", saveAvatarToStorage))
+  @UseInterceptors(FileInterceptor("avatar", {storage: memoryStorage()}))
   @HttpCode(HttpStatus.CREATED)
   async upload(
     @UploadedFile() file: Express.Multer.File,
     @Param("id") _id: Types.ObjectId,
   ): Promise<UserDocument> {
-    console.log(file);
-    return await this.usersService.uploadFile(file, _id);
-  } */
+    try {
+      const uniqueSuffix = randomUUID();
+      const ext = extname(file.originalname);
+      const filename = `${uniqueSuffix}${ext}`;
+      await this.utilsService.uploadFileToS3(file, filename, 'uploads/avatars')
+      return this.usersService.updateUserImageId(_id, filename);
+    } catch (error) {
+      Logging.error(error);
+      throw new InternalServerErrorException(
+        "Something went wrong while uploading user avatar",
+      );
+    }
+  }
 
   @Get(":id/:token(*)")
   @UseGuards(JwtAuthGuard, UserGuard)

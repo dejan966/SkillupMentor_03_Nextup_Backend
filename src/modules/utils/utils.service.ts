@@ -44,10 +44,10 @@ export class UtilsService {
     }
   }
 
-  async uploadFileToS3(file: Express.Multer.File, filename: string)
+  async uploadFileToS3(file: Express.Multer.File, filename: string, path: string)
   {
     const bucketName = process.env.AWS_BUCKET_NAME;
-    const key = `uploads/events/${filename}`;
+    const key = `${path}/${filename}`;
 
     try {
       await this.s3.send(
@@ -56,10 +56,14 @@ export class UtilsService {
             Key: key,
             Body: file.buffer,
             ContentType: file.mimetype,
+            ACL: 'public-read'
         }),
       );
     } catch (error) {
-      console.log(error)
+      Logging.error(error);
+      throw new InternalServerErrorException(
+        "Something went wrong while uploading an image",
+      );
     }
   }
 }

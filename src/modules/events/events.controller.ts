@@ -12,6 +12,7 @@ import {
   HttpCode,
   HttpStatus,
   Query,
+  InternalServerErrorException,
 } from "@nestjs/common";
 import { EventsService } from "./events.service";
 import { CreateEventDto } from "./dto/create-event.dto";
@@ -21,7 +22,7 @@ import { GetCurrentUser } from "../../decorators/get-current-user.decorator";
 import { UserDocument } from "../../schemas/user.schema";
 import { EventDocument, Event } from "../../schemas/event.schema";
 import { FileInterceptor } from "@nestjs/platform-express";
-import { extname, join } from "path";
+import { extname } from "path";
 import { Types } from "mongoose";
 import MongooseClassSerializerInterceptor from "../../interceptors/mongoose.interceptor";
 import { PaginatedResult } from "../../interfaces/paginated-result";
@@ -32,6 +33,7 @@ import moment from "moment";
 import { UtilsService } from "../utils/utils.service";
 import { memoryStorage } from "multer";
 import { randomUUID } from "crypto";
+import Logging from "library/Logging";
 
 @Controller("events")
 @UseInterceptors(MongooseClassSerializerInterceptor(Event))
@@ -144,22 +146,14 @@ export class EventsController {
       const uniqueSuffix = randomUUID();
       const ext = extname(file.originalname);
       const filename = `${uniqueSuffix}${ext}`;
-      await this.utilsService.uploadFileToS3(file, filename)
+      await this.utilsService.uploadFileToS3(file, filename, 'uploads/events')
       return this.eventsService.updateEventImageId(_id, filename);
     } catch (error) {
-      console.log(error)
+      Logging.error(error);
+      throw new InternalServerErrorException(
+        "Something went wrong while uploading events image",
+      );
     }
-    /* const filename = file?.filename;
-
-    if (!filename) throw new BadRequestException("File must be a png, jpg/jpeg");
-
-    const imagesFolderPath = join(process.cwd(), "uploads/events");
-    const fullImagePath = join(imagesFolderPath + "/" + file.filename);
-    if (await isFileExtensionSafe(fullImagePath)) {
-      return this.eventsService.updateEventImageId(_id, filename);
-    }
-    removeFile(fullImagePath); */
-    //throw new BadRequestException("File content does not match extension!");
   }
 
   @Get(":id")
